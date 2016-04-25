@@ -49,23 +49,36 @@ public class Balancity
                 setOSMFile(testOsm).setCHEnable(false);
         hopper.importOrLoad();
 
-        int num_iterations = 10;
-        for (int i = 0; i < num_iterations; i++)
+        int num_iterations = 200;
+        SimulationSetup sim = new SimulationSetup();
+        //ArrayList<VehicleUnit> instance = sim.generateInstance(num_iterations, 1);
+        //sim.saveInstance(instance, "testSave.txt");
+        ArrayList<VehicleUnit> loaded_instance = sim.loadInstance("testSave.txt");
+        
+        int i =0;
+        for (VehicleUnit item:loaded_instance)
         {
-            GHRequest routerequest = new GHRequest(new GHPoint(latFrom, lonFrom),new GHPoint(latTo, lonTo));//new GHRequest(latFrom, lonFrom, latTo, lonTo);
+            GHRequest routerequest = new GHRequest(item.getOrigin(),item.getDestination());//new GHRequest(latFrom, lonFrom, latTo, lonTo);
             GHResponse ans = hopper.route(routerequest);
 
             PathWrapper path = ans.getBest();
+            if(!path.hasErrors()){
             PointList points = path.getPoints();
             InstructionList instr = path.getInstructions();
             System.out.println("Distance: " + path.getTime());
-            if (i == num_iterations - 1)
-            {
-                FileUtils.writeStringToFile(new File("test" + i + ".gpx"), instr.createGPX(testGPX, 925));
-            }
+            FileUtils.writeStringToFile(new File("testfiles/test" + i + ".gpx"), instr.createGPX("" +i,2));
+
+            
             for (GHPoint p : points)
             {
                 removeEdge(hopper, p.lat, p.lon);
+            }
+            i++;
+            }
+            else
+            {
+                System.out.println(path.getErrors().toString());
+                System.out.println(item.getOrigin() + " to: " + item.getDestination());
             }
         }
 
@@ -84,7 +97,7 @@ public class Balancity
         EdgeIteratorState edge = qr.getClosestEdge();
         FlagEncoder encoder = hopper.getEncodingManager().getEncoder("car");
         double old_speed = encoder.getSpeed(edge.getFlags());
-        double new_speed = old_speed - 3;
+        double new_speed = old_speed;
         if (new_speed < 10)
         {
             new_speed = 10;

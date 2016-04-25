@@ -34,6 +34,29 @@ public class VehicleUnit
     }
     
     public String toString(){
-        return origin.getLat() + ", "+ origin.getLon()+"; " + destination.getLat() +", " + destination.getLon() +"; " +startTime;
+        return origin.getLat() + ", "+ origin.getLon()+";" + destination.getLat() +", " + destination.getLon() +";" +startTime;
+    }
+    
+    public GHPoint getOrigin(){
+        return this.origin;
+    }
+    
+    public GHPoint getDestination(){
+        return this.destination;
+    }
+    
+    public int getStartTime(){
+        return this.startTime;
+    }
+    
+    public boolean equals(Object o){
+        if (o instanceof VehicleUnit){
+            VehicleUnit object = (VehicleUnit) o;
+            return this.getDestination().equals(object.getDestination()) && this.getOrigin().equals(object.getOrigin()) &&
+                    this.getStartTime() == object.getStartTime();
+        }
+        else{
+            return false;
+        }
     }
 }

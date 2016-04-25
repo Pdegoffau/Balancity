@@ -29,12 +29,12 @@ import java.util.logging.Logger;
 public class SimulationSetup
 {
     ArrayList<GHPoint> sources, destinations;
-    GHPoint a2_south_in= new GHPoint(52.206342, 4.986928);
-    GHPoint a2_south_out = new GHPoint(52.206414, 4.986252);
+    GHPoint a2_south_in= new GHPoint(52.222376, 4.986595);
+    GHPoint a2_south_out = new GHPoint(52.222291, 4.985683);
     GHPoint a4_south_west_in = new GHPoint(52.206032, 4.620566);
     GHPoint a4_south_west_out = new GHPoint(52.206100, 4.620024);
-    GHPoint a44_west_in = new GHPoint(52.220520, 4.538188);
-    GHPoint a44_west_out = new GHPoint(52.220697, 4.538387);
+    GHPoint a44_west_in = new GHPoint(52.221418, 4.542734);
+    GHPoint a44_west_out = new GHPoint(52.221515, 4.542645);
     GHPoint a9_north_in = new GHPoint(52.522346, 4.719106);
     GHPoint a9_north_out = new GHPoint(52.522333, 4.719353);
     GHPoint n246_north_in = new GHPoint(52.521681, 4.785096);
@@ -56,7 +56,7 @@ public class SimulationSetup
     GHPoint offices = new GHPoint(52.400623, 4.836363); //Industry park Westpoort
     GHPoint molenwijk = new GHPoint(52.418934, 4.890091); //Residences north of Amsterdam
     
-    public void init(){
+    public SimulationSetup(){
         this.sources = new ArrayList<GHPoint>();
         this.destinations = new ArrayList<GHPoint>();
         
@@ -99,14 +99,16 @@ public class SimulationSetup
         if(num_items<sources.size()*destinations.size()){
             System.err.println("Not every combination between sources and destination can be generated!");
         }
-        init();
+        
         ArrayList<VehicleUnit> test_objects = new ArrayList<VehicleUnit>(num_items);
         
         while(test_objects.size()<num_items){
-            int s = (int) (Math.random()*sources.size());
-            int d = (int) (Math.random()*destinations.size());
+            int s = (int) (Math.random()*(sources.size()-1));
+            int d = (int) (Math.random()*(destinations.size()-1));
             int t = (int) (Math.random()*time_interval);
-            test_objects.add(new VehicleUnit(sources.get(s),destinations.get(d),t));
+            if((!sources.get(s).equals(destinations.get(d)))&&(!tooClose(sources.get(s),destinations.get(d)))){
+                test_objects.add(new VehicleUnit(sources.get(s),destinations.get(d),t));
+            }
         }
 
         return test_objects;
@@ -147,5 +149,25 @@ public class SimulationSetup
             Logger.getLogger(SimulationSetup.class.getName()).log(Level.SEVERE, null, ex);
         }
         return res;
+    }
+
+    /**
+     * This method determines if two GPS coordinates are to close to each others to be used for vehicle simulation
+     * @param s point 1
+     * @param d point 2
+     * @return true if points are within have euclidean distance < 0.001 
+     */
+    private boolean tooClose( GHPoint s, GHPoint d)
+    {
+        double dis_lon = Math.abs(s.getLon()-d.getLon());
+        double dis_lat = Math.abs(s.getLat()-d.getLat());
+        if(Math.sqrt(Math.pow(dis_lat, 2) + Math.pow(dis_lon, 2)) <0.001)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 }
