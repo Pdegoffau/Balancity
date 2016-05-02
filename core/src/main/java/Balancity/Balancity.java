@@ -38,10 +38,6 @@ public class Balancity
         String ghLoc = "target/balancity";
         String testOsm = "C:/Users/Paul de Goffau/Desktop/Master thesis/graphhopper/Amsterdam.osm.pbf";
         String testGPX = "testGPX";
-        double latFrom = 52.275159;
-        double lonFrom = 4.957009;
-        double latTo = 52.444960;
-        double lonTo = 4.853645;
 
         BalanceHopper hopper = (BalanceHopper) new BalanceHopper().setStoreOnFlush(true).
                 setEncodingManager(new EncodingManager("CAR")).
@@ -51,14 +47,14 @@ public class Balancity
 
         int num_iterations = 200;
         SimulationSetup sim = new SimulationSetup();
-        //ArrayList<VehicleUnit> instance = sim.generateInstance(num_iterations, 1);
+        //ArrayList<VehicleUnit> instance = sim.generateInstance(num_iterations, 10);
         //sim.saveInstance(instance, "testSave.txt");
         ArrayList<VehicleUnit> loaded_instance = sim.loadInstance("testSave.txt");
         
         int i =0;
         for (VehicleUnit item:loaded_instance)
         {
-            GHRequest routerequest = new GHRequest(item.getOrigin(),item.getDestination());//new GHRequest(latFrom, lonFrom, latTo, lonTo);
+            GHRequest routerequest = new GHRequest(item.getOrigin(),item.getDestination()).setAlgorithm("dijkstrabi");//new GHRequest(latFrom, lonFrom, latTo, lonTo);
             GHResponse ans = hopper.route(routerequest);
 
             PathWrapper path = ans.getBest();
@@ -66,7 +62,7 @@ public class Balancity
             PointList points = path.getPoints();
             InstructionList instr = path.getInstructions();
             System.out.println("Distance: " + path.getTime());
-            FileUtils.writeStringToFile(new File("testfiles/test" + i + ".gpx"), instr.createGPX("" +i,2));
+            //FileUtils.writeStringToFile(new File("testfiles/test" + i + ".gpx"), instr.createGPX("" +i,2));
 
             
             for (GHPoint p : points)

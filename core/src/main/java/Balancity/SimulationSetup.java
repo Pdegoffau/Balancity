@@ -105,7 +105,7 @@ public class SimulationSetup
         while(test_objects.size()<num_items){
             int s = (int) (Math.random()*(sources.size()-1));
             int d = (int) (Math.random()*(destinations.size()-1));
-            int t = (int) (Math.random()*time_interval);
+            int t = (int) (Math.random()*(time_interval+1));
             if((!sources.get(s).equals(destinations.get(d)))&&(!tooClose(sources.get(s),destinations.get(d)))){
                 test_objects.add(new VehicleUnit(sources.get(s),destinations.get(d),t));
             }
