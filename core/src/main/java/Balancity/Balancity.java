@@ -37,7 +37,7 @@ public class Balancity
     {
         String ghLoc = "target/balancity";
         String testOsm = "C:/Users/Paul de Goffau/Desktop/Master thesis/graphhopper/Amsterdam.osm.pbf";
-        String testGPX = "testGPX";
+        String testGPX = "C:/xampp/htdocs/testfiles/test";
 
         BalanceHopper hopper = (BalanceHopper) new BalanceHopper().setStoreOnFlush(true).
                 setEncodingManager(new EncodingManager("CAR")).
@@ -59,16 +59,9 @@ public class Balancity
 
             PathWrapper path = ans.getBest();
             if(!path.hasErrors()){
-            PointList points = path.getPoints();
             InstructionList instr = path.getInstructions();
             System.out.println("Distance for route "+i+": " + path.getTime());
-            FileUtils.writeStringToFile(new File("C:/xampp/htdocs/testfiles/test" + i + ".gpx"), instr.createGPX(""+i, 0, false, false, true, false));
-
-            
-            for (GHPoint p : points)
-            {
-                removeEdge(hopper, p.lat, p.lon);
-            }
+            FileUtils.writeStringToFile(new File(testGPX + i + ".gpx"), instr.createGPX(""+i, 0, false, false, true, false));
             i++;
             }
             else
@@ -83,22 +76,5 @@ public class Balancity
          }
          System.out.println("Distance: " + path.getDistance());
          */
-    }
-
-    private static double removeEdge( GraphHopper hopper, double lat, double lng )
-    {
-
-        LocationIndex index = hopper.getLocationIndex();
-        QueryResult qr = index.findClosest(lat, lng, EdgeFilter.ALL_EDGES);
-        EdgeIteratorState edge = qr.getClosestEdge();
-        FlagEncoder encoder = hopper.getEncodingManager().getEncoder("car");
-        double old_speed = encoder.getSpeed(edge.getFlags());
-        double new_speed = old_speed;
-        if (new_speed < 10)
-        {
-            new_speed = 10;
-        }
-        edge.setFlags(encoder.setSpeed(edge.getFlags(), new_speed));
-        return Double.POSITIVE_INFINITY;
     }
 }
