@@ -1,4 +1,26 @@
 /*
+ * Copyright 2016 Paul de Goffau.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package Balancity;
+
+/**
+ *
+ * @author Paul de Goffau
+ */
+/*
  *  Licensed to GraphHopper and Peter Karich under one or more contributor
  *  license agreements. See the NOTICE file distributed with this work for 
  *  additional information regarding copyright ownership.
@@ -15,8 +37,10 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package com.graphhopper.routing;
 
+import com.graphhopper.routing.AbstractRoutingAlgorithm;
+import com.graphhopper.routing.AlgorithmOptions;
+import com.graphhopper.routing.Path;
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 
@@ -36,15 +60,15 @@ import com.graphhopper.util.EdgeIterator;
  * <p>
  * @author Peter Karich
  */
-public class Dijkstra extends AbstractRoutingAlgorithm
+public class DijkstraTimeDependent extends AbstractRoutingAlgorithm
 {
-    protected TIntObjectMap<SPTEntry> fromMap;
-    protected PriorityQueue<SPTEntry> fromHeap;
-    protected SPTEntry currEdge;
+    protected TIntObjectMap<TDSPTEntry> fromMap;
+    protected PriorityQueue<TDSPTEntry> fromHeap;
+    protected TDSPTEntry currEdge;
     private int visitedNodes;
     private int to = -1;
 
-    public Dijkstra( Graph g, FlagEncoder encoder, Weighting weighting, TraversalMode tMode )
+    public DijkstraTimeDependent( Graph g, FlagEncoder encoder, Weighting weighting, TraversalMode tMode )
     {
         super(g, encoder, weighting, tMode);
         initCollections(1000);
@@ -52,8 +76,8 @@ public class Dijkstra extends AbstractRoutingAlgorithm
 
     protected void initCollections( int size )
     {
-        fromHeap = new PriorityQueue<SPTEntry>(size);
-        fromMap = new TIntObjectHashMap<SPTEntry>(size);
+        fromHeap = new PriorityQueue<TDSPTEntry>(size);
+        fromMap = new TIntObjectHashMap<TDSPTEntry>(size);
     }
 
     @Override
@@ -61,7 +85,7 @@ public class Dijkstra extends AbstractRoutingAlgorithm
     {
         checkAlreadyRun();
         this.to = to;
-        currEdge = createSPTEntry(from, 0);
+        currEdge = createTDSPTEntry(from, 0,0);
         if (!traversalMode.isEdgeBased())
         {
             fromMap.put(from, currEdge);
@@ -87,14 +111,15 @@ public class Dijkstra extends AbstractRoutingAlgorithm
                     continue;
 
                 int traversalId = traversalMode.createTraversalId(iter, false);
-                double tmpWeight = weighting.calcWeight(iter, false, currEdge.edge);
+                double[] tmpWeights = weighting.calcWeight(iter, false, currEdge.edge,(int)(currEdge.time));
+                double tmpWeight = tmpWeights[0] + currEdge.weight;
                 if (Double.isInfinite(tmpWeight))
                     continue;
 
-                SPTEntry nEdge = fromMap.get(traversalId);
+                TDSPTEntry nEdge = fromMap.get(traversalId);
                 if (nEdge == null)
                 {
-                    nEdge = new SPTEntry(iter.getEdge(), iter.getAdjNode(), tmpWeight);
+                    nEdge = new TDSPTEntry(iter.getEdge(), iter.getAdjNode(), tmpWeight,tmpWeights[1]);
                     nEdge.parent = currEdge;
                     fromMap.put(traversalId, nEdge);
                     fromHeap.add(nEdge);
@@ -103,6 +128,7 @@ public class Dijkstra extends AbstractRoutingAlgorithm
                     fromHeap.remove(nEdge);
                     nEdge.edge = iter.getEdge();
                     nEdge.weight = tmpWeight;
+                    nEdge.time = tmpWeights[1];
                     nEdge.parent = currEdge;
                     fromHeap.add(nEdge);
                 } else
@@ -119,6 +145,11 @@ public class Dijkstra extends AbstractRoutingAlgorithm
                 throw new AssertionError("Empty edge cannot happen");
         }
     }
+    
+    protected TDSPTEntry createTDSPTEntry( int node, double weight, double time )
+    {
+        return new TDSPTEntry(EdgeIterator.NO_EDGE, node, weight,time);
+    }
 
     @Override
     protected boolean finished()
@@ -129,10 +160,10 @@ public class Dijkstra extends AbstractRoutingAlgorithm
     @Override
     protected Path extractPath()
     {
-        if (currEdge == null || isWeightLimitExceeded() || !finished())
+        if (currEdge == null || isWeightLimitExceeded() || !finished()){
             return createEmptyPath();
-
-        return new Path(graph, flagEncoder).setWeight(currEdge.weight).setSPTEntry(currEdge).extract();
+        }
+        return new Path(graph, flagEncoder).setWeight(currEdge.weight).setTDSPTEntry(currEdge).extract();
     }
 
     @Override
@@ -150,6 +181,7 @@ public class Dijkstra extends AbstractRoutingAlgorithm
     @Override
     public String getName()
     {
-        return AlgorithmOptions.DIJKSTRA;
+        return AlgorithmOptions.DIJKSTRA_TIME_DEPENDENT;
     }
 }
+

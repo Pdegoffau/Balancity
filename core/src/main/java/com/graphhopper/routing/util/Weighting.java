@@ -54,5 +54,5 @@ public interface Weighting
      */
     boolean matches( String weightingAsStr, FlagEncoder encoder );
 
-    double calcWeight( EdgeIteratorState iter, boolean reverse, int edgeId, int time );
+    double[] calcWeight( EdgeIteratorState iter, boolean reverse, int edgeId, int time );
 }

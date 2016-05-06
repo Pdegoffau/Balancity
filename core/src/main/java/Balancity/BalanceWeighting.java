@@ -55,13 +55,24 @@ public class BalanceWeighting extends AbstractWeighting
         return time;
     }
 
-    public double calcWeight( EdgeIteratorState edge, boolean reverse, int prevOrNextEdgeId ,int startTime)
+    public double[] calcWeight( EdgeIteratorState edge, boolean reverse, int prevOrNextEdgeId ,int startTime)
     {
+        double[] res = new double[2];
         double speed = reverse ? flagEncoder.getReverseSpeed(edge.getFlags()) : flagEncoder.getSpeed(edge.getFlags());
-        if (speed == 0)
-            return Double.POSITIVE_INFINITY;
+        if (speed == 0){
+            res[0] = Double.POSITIVE_INFINITY;
+            res[1] = Double.POSITIVE_INFINITY;
+            return res;
+        }
 
         double tmpWeight = edge.getDistance() / speed * SPEED_CONV;
+        
+        // add direction penalties at start/stop/via points
+        boolean penalizeEdge = edge.getBoolean(EdgeIteratorState.K_UNFAVORED_EDGE, reverse, false);
+        if (penalizeEdge)
+            tmpWeight += PENALTY;
+        
+        res[1] = tmpWeight; //Time duration of edge
         int tfc;
         tfc = edge.getTrafficCount(startTime);
         
@@ -70,14 +81,10 @@ public class BalanceWeighting extends AbstractWeighting
             System.out.println("Traffic count: "+tfc);
         }
         */
-        //tmpWeight += tfc*30;
+        tmpWeight += tfc*3;
 
-        // add direction penalties at start/stop/via points
-        boolean penalizeEdge = edge.getBoolean(EdgeIteratorState.K_UNFAVORED_EDGE, reverse, false);
-        if (penalizeEdge)
-            tmpWeight += PENALTY;
-
-        return tmpWeight;
+        res[0] = tmpWeight; //Weight that is used for route choices
+        return res;
     }
     
     @Override

@@ -116,7 +116,7 @@ public class TurnWeighting implements Weighting
     }
 
     @Override
-    public double calcWeight( EdgeIteratorState iter, boolean reverse, int edgeId, int time )
+    public double[] calcWeight( EdgeIteratorState iter, boolean reverse, int edgeId, int time )
     {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }

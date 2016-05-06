@@ -17,18 +17,14 @@
  */
 package com.graphhopper.routing;
 
+import Balancity.TDSPTEntry;
 import com.graphhopper.routing.util.DefaultEdgeFilter;
 import com.graphhopper.routing.util.FlagEncoder;
-import com.graphhopper.storage.SPTEntry;
-import com.graphhopper.storage.Graph;
-import com.graphhopper.storage.NodeAccess;
+import com.graphhopper.storage.*;
 import com.graphhopper.util.*;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * Stores the nodes for the found path of an algorithm. It additionally needs the edgeIds to make
@@ -54,6 +50,7 @@ public class Path
      * Shortest path tree entry
      */
     protected SPTEntry sptEntry;
+    protected TDSPTEntry tdsptEntry;
     final StopWatch extractSW = new StopWatch("extract");
     private int fromNode = -1;
     protected int endNode = -1;
@@ -101,6 +98,12 @@ public class Path
     public Path setSPTEntry( SPTEntry sptEntry )
     {
         this.sptEntry = sptEntry;
+        return this;
+    }
+    
+    public Path setTDSPTEntry (TDSPTEntry tdsptEntry)
+    {
+        this.tdsptEntry = tdsptEntry;
         return this;
     }
 
@@ -194,11 +197,11 @@ public class Path
             throw new IllegalStateException("Extract can only be called once");
 
         extractSW.start();
-        SPTEntry goalEdge = sptEntry;
+        TDSPTEntry goalEdge = tdsptEntry;
         setEndNode(goalEdge.adjNode);
         while (EdgeIterator.Edge.isValid(goalEdge.edge))
         {
-            processEdge(goalEdge.edge, goalEdge.adjNode);
+            processEdge(goalEdge);
             goalEdge = goalEdge.parent;
         }
 
@@ -240,6 +243,16 @@ public class Path
         iter.setTrafficCount(iter.getTrafficCount((int)(distance))+1, (int)(distance));
         time += calcMillis(dist, iter.getFlags(), false);
         addEdge(edgeId);
+    }
+
+    private void processEdge(TDSPTEntry edge )
+    {
+        EdgeIteratorState iter = graph.getEdgeIteratorState(edge.edge, edge.adjNode);
+        double dist = edge.weight;
+        distance += dist;
+        iter.setTrafficCount(iter.getTrafficCount((int)(edge.time))+1, (int)(edge.time));
+        time += edge.time;
+        addEdge(edge.edge);
     }
 
     /**

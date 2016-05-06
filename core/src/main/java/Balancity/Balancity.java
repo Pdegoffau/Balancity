@@ -38,6 +38,7 @@ public class Balancity
         String ghLoc = "target/balancity";
         String testOsm = "C:/Users/Paul de Goffau/Desktop/Master thesis/graphhopper/Amsterdam.osm.pbf";
         String testGPX = "C:/xampp/htdocs/testfiles/test";
+        String trafficData = "C:/xampp/htdocs/trafficData.txt";
 
         BalanceHopper hopper = (BalanceHopper) new BalanceHopper().setStoreOnFlush(true).
                 setEncodingManager(new EncodingManager("CAR")).
@@ -54,13 +55,13 @@ public class Balancity
         int i =0;
         for (VehicleUnit item:loaded_instance)
         {
-            GHRequest routerequest = new GHRequest(item.getOrigin(),item.getDestination()).setAlgorithm("dijkstra").setWeighting("balanced");//new GHRequest(latFrom, lonFrom, latTo, lonTo);
+            GHRequest routerequest = new GHRequest(item.getOrigin(),item.getDestination()).setAlgorithm("dijkstraTimeDependent").setWeighting("balanced");//new GHRequest(latFrom, lonFrom, latTo, lonTo);
             GHResponse ans = hopper.route(routerequest);
 
             PathWrapper path = ans.getBest();
             if(!path.hasErrors()){
             InstructionList instr = path.getInstructions();
-            System.out.println("Distance for route "+i+": " + path.getTime());
+            System.out.println("Time for route "+i+": " + path.getTime());
             FileUtils.writeStringToFile(new File(testGPX + i + ".gpx"), instr.createGPX(""+i, 0, false, false, true, false));
             i++;
             }
@@ -70,6 +71,8 @@ public class Balancity
                 System.out.println(item.getOrigin() + " to: " + item.getDestination());
             }
         }
+        TrafficData dt = new TrafficData();
+        dt.saveTrafficToFile(hopper, trafficData);
 
         /*        for(Instruction instruction : instr) {
          System.out.println(instruction.toString());

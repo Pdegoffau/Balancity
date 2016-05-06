@@ -17,6 +17,7 @@
  */
 package com.graphhopper.routing;
 
+import Balancity.DijkstraTimeDependent;
 import com.graphhopper.routing.util.BeelineWeightApproximator;
 import com.graphhopper.routing.util.WeightApproximator;
 import com.graphhopper.storage.Graph;
@@ -49,7 +50,10 @@ public class RoutingAlgorithmFactorySimple implements RoutingAlgorithmFactory
         } else if (AlgorithmOptions.DIJKSTRA_ONE_TO_MANY.equalsIgnoreCase(algoStr))
         {
             return new DijkstraOneToMany(g, opts.getFlagEncoder(), opts.getWeighting(), opts.getTraversalMode());
-        } else if (AlgorithmOptions.ASTAR.equalsIgnoreCase(algoStr))
+        } else if(AlgorithmOptions.DIJKSTRA_TIME_DEPENDENT.equalsIgnoreCase(algoStr))
+        {
+            return new DijkstraTimeDependent(g, opts.getFlagEncoder(), opts.getWeighting(), opts.getTraversalMode());       
+        }else if (AlgorithmOptions.ASTAR.equalsIgnoreCase(algoStr))
         {
             AStar aStar = new AStar(g, opts.getFlagEncoder(), opts.getWeighting(), opts.getTraversalMode());
             aStar.setApproximation(getApproximation(AlgorithmOptions.ASTAR, opts, g.getNodeAccess()));

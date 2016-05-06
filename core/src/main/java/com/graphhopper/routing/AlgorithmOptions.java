@@ -48,6 +48,10 @@ public class AlgorithmOptions
      */
     public static final String DIJKSTRA_ONE_TO_MANY = "dijkstraOneToMany";
     /**
+     * Unidirectional time dependent Dijkstra
+     */
+    public static final String DIJKSTRA_TIME_DEPENDENT = "dijkstraTimeDependent";
+    /**
      * Unidirectional A*
      */
     public static final String ASTAR = "astar";
