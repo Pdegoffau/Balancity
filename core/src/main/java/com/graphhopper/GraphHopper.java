@@ -17,23 +17,17 @@
  */
 package com.graphhopper;
 
+import Balancity.BalanceWeighting;
 import com.graphhopper.reader.DataReader;
 import com.graphhopper.reader.OSMReader;
-import com.graphhopper.reader.dem.CGIARProvider;
-import com.graphhopper.reader.dem.ElevationProvider;
-import com.graphhopper.reader.dem.SRTMProvider;
+import com.graphhopper.reader.dem.*;
 import com.graphhopper.routing.*;
 import com.graphhopper.routing.ch.PrepareContractionHierarchies;
 import com.graphhopper.routing.util.*;
 import com.graphhopper.storage.*;
-import com.graphhopper.storage.index.LocationIndex;
-import com.graphhopper.storage.index.LocationIndexTree;
-import com.graphhopper.storage.index.QueryResult;
+import com.graphhopper.storage.index.*;
 import com.graphhopper.util.*;
 import com.graphhopper.util.shapes.GHPoint;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;
@@ -41,6 +35,8 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Easy to use access point to configure import and (offline) routing.
@@ -994,6 +990,8 @@ public class GraphHopper implements GraphHopperAPI
                 return new CurvatureWeighting(encoder, weightingMap, ghStorage);
             else
                 return new FastestWeighting(encoder, weightingMap);
+        } else if ("balanced".equalsIgnoreCase(weighting)){
+                return new BalanceWeighting(encoder);
         }
 
         throw new UnsupportedOperationException("weighting " + weighting + " not supported");

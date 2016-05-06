@@ -170,4 +170,16 @@ class SynchedDAWrapper implements DataAccess
     {
         return type;
     }
+
+    @Override
+    public void setTrfCnt( int edgeOrShortcutId, int time, int trafficCount )
+    {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public int getTrfCnt( int edgeId, int time )
+    {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 }

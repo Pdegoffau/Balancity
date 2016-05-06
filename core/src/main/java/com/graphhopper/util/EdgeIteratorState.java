@@ -75,6 +75,10 @@ public interface EdgeIteratorState
      * @return the distance of the current edge in meter
      */
     double getDistance();
+    
+    int getTrafficCount(int time);
+    
+    void setTrafficCount(int trafficCnt, int time);
 
     EdgeIteratorState setDistance( double dist );
 

@@ -49,4 +49,10 @@ public class ShortestWeighting extends AbstractWeighting
     {
         return "shortest";
     }
+
+    @Override
+    public double calcWeight( EdgeIteratorState iter, boolean reverse, int edgeId, int time )
+    {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 }

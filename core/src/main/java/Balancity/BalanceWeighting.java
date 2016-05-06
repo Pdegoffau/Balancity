@@ -19,6 +19,7 @@ package Balancity;
 import com.graphhopper.routing.util.AbstractWeighting;
 import com.graphhopper.routing.util.FlagEncoder;
 import com.graphhopper.routing.util.Weighting;
+import com.graphhopper.util.EdgeIterator;
 import com.graphhopper.util.EdgeIteratorState;
 
 /**
@@ -60,14 +61,23 @@ public class BalanceWeighting extends AbstractWeighting
         if (speed == 0)
             return Double.POSITIVE_INFINITY;
 
-        double time = edge.getDistance() / speed * SPEED_CONV;
+        double tmpWeight = edge.getDistance() / speed * SPEED_CONV;
+        int tfc;
+        tfc = edge.getTrafficCount(startTime);
+        
+        /*
+        if(tfc>0){
+            System.out.println("Traffic count: "+tfc);
+        }
+        */
+        //tmpWeight += tfc*30;
 
         // add direction penalties at start/stop/via points
         boolean penalizeEdge = edge.getBoolean(EdgeIteratorState.K_UNFAVORED_EDGE, reverse, false);
         if (penalizeEdge)
-            time += PENALTY;
+            tmpWeight += PENALTY;
 
-        return time;
+        return tmpWeight;
     }
     
     @Override

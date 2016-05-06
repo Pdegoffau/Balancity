@@ -131,4 +131,7 @@ public interface DataAccess extends Storable<DataAccess>
      * @return the data access type of this object.
      */
     DAType getType();
+
+    public void setTrfCnt( int edgeOrShortcutId, int time, int trafficCount );
+    public int getTrfCnt (int edgeId, int time);
 }

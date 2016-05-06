@@ -19,11 +19,11 @@ package com.graphhopper.storage;
 
 import com.graphhopper.util.BitUtil;
 import com.graphhopper.util.Helper;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.RandomAccessFile;
+import java.io.*;
 import java.nio.ByteOrder;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Peter Karich
@@ -44,6 +44,11 @@ public abstract class AbstractDataAccess implements DataAccess
     protected final ByteOrder byteOrder;
     protected final BitUtil bitUtil;
     protected transient boolean closed = false;
+    protected RandomAccessFile trafficCnt;
+    protected ArrayList<ArrayList<Integer>> trafficCount;
+    protected HashMap edgeIdToTFCcount = new HashMap<Integer, HashMap<Integer, Integer>>();
+    private int it = 0;
+    private int MAX_TIME = 1200;
 
     public AbstractDataAccess( String name, String location, ByteOrder order )
     {
@@ -54,6 +59,47 @@ public abstract class AbstractDataAccess implements DataAccess
             throw new IllegalArgumentException("Create DataAccess object via its corresponding Directory!");
 
         this.location = location;
+        this.trafficCount = new ArrayList(new ArrayList<Integer>());
+        File file = new File("EdgeTrafficCnt");
+        try
+        {
+            this.trafficCnt = new RandomAccessFile("EdgeTrafficCnt", "rw");
+        } catch (FileNotFoundException ex)
+        {
+            Logger.getLogger(AbstractDataAccess.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        if (!file.isFile())
+        {
+            init(); //Switch off if the file does exist
+        }
+    }
+
+    public void init()
+    {
+        try
+        {
+            this.trafficCnt = new RandomAccessFile("EdgeTrafficCnt", "rw");
+            byte[] data = new byte[4];
+            for (int edgeId = 0; edgeId < getSegmentSize(); edgeId++)
+            {
+                for (int time = 0; time < 1022; time++)
+                {
+                    long edgePointer = 4 * ((long) edgeId + (long) time * getSegmentSize());
+                    trafficCnt.seek(edgePointer);
+                    data[0] = 0;
+                    data[1] = 0;
+                    data[2] = 0;
+                    data[3] = 0;
+                    this.trafficCnt.write(data);
+                }
+            }
+        } catch (FileNotFoundException ex)
+        {
+            Logger.getLogger(AbstractDataAccess.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex)
+        {
+            Logger.getLogger(AbstractDataAccess.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     @Override
@@ -247,5 +293,95 @@ public abstract class AbstractDataAccess implements DataAccess
     protected boolean isIntBased()
     {
         return false;
+    }
+
+    @Override
+    public void setTrfCnt( int edgeId, int time, int trafficCount )
+    {
+        if (edgeIdToTFCcount.containsKey(edgeId))
+        {
+            //ArrayList<Integer> times = (ArrayList<Integer>) this.edgeIdToTFCcount.get(edgeId);
+            //times.set(time, trafficCount);
+            ((HashMap) edgeIdToTFCcount.get(edgeId)).put(time, trafficCount);
+        } else
+        {
+            /*
+             //edgeIdToTFCcount.put(edgeId, times);
+             ArrayList<Integer> times= new ArrayList<>(MAX_TIME);
+             if (time < MAX_TIME)
+             {
+             for (int i = 0; i < MAX_TIME; i++)
+             {
+             if (i != time)
+             {
+             times.add(i, 0);
+             } else
+             times.add(i, trafficCount);
+             }
+             }else
+             {
+             for(int i=MAX_TIME;i<time;i++){
+             times.add(i,0);
+             }
+             times.add(time,trafficCount);
+             }
+             */
+            edgeIdToTFCcount.put(edgeId, new HashMap(time, trafficCount));
+            //this.trafficCount.add(it,times);
+            //it++;
+        }
+
+        /*
+         try
+         {
+         long edgePointer =4*(edgeId+time*getSegmentSize());
+         this.trafficCnt.seek(edgePointer);
+         byte[] data = new byte[4];
+         data[0] = (byte) trafficCount;
+         data[1] = (byte) (trafficCount >>> 8);
+         data[2] = (byte) (trafficCount >>> 16);
+         data[3] = (byte) (trafficCount >>> 24);
+         this.trafficCnt.write(data);
+         } catch (IOException ex)
+         {
+         Logger.getLogger(AbstractDataAccess.class.getName()).log(Level.SEVERE, null, ex);
+         }
+         */
+    }
+
+    @Override
+    public int getTrfCnt( int edgeId, int time )
+    {
+        if (edgeIdToTFCcount.containsKey(edgeId))
+        {
+            if (((HashMap) edgeIdToTFCcount.get(edgeId)).containsKey(time))
+            {
+                int trfCnt = (int) ((HashMap) edgeIdToTFCcount.get(edgeId)).get(time);
+                return trfCnt;
+            } else
+                return 0;
+            //System.out.println("edgeId: "+edgeId + " time: "+time+ " hashValue: "+edgeIdToTFCcount.get(edgeId));
+            //int trfCnt = this.trafficCount.get((int)edgeIdToTFCcount.get(edgeId)).get(time);
+
+        } else
+            return 0;
+        /*
+         try
+         {
+         long edgePointer =4*(edgeId+time*getSegmentSize());
+         this.trafficCnt.seek(edgePointer);
+         byte[] data = new byte[4];
+         this.trafficCnt.read(data);
+         int res=    (data[3]<<24)&0xff000000|
+         (data[2]<<16)&0x00ff0000|
+         (data[1]<< 8)&0x0000ff00|
+         data[0]&0x000000ff;
+         return res;
+         } catch (IOException ex)
+         {
+         Logger.getLogger(AbstractDataAccess.class.getName()).log(Level.SEVERE, null, ex);
+         }
+         return -1; //In case something goes wrong, negative number of traffic is not presumably
+         */
     }
 }

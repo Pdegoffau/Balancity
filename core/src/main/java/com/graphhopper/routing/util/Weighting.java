@@ -17,6 +17,7 @@
  */
 package com.graphhopper.routing.util;
 
+import com.graphhopper.util.EdgeIterator;
 import com.graphhopper.util.EdgeIteratorState;
 
 /**
@@ -52,4 +53,6 @@ public interface Weighting
      * Returns true if the specified weighting and encoder matches to this Weighting.
      */
     boolean matches( String weightingAsStr, FlagEncoder encoder );
+
+    double calcWeight( EdgeIteratorState iter, boolean reverse, int edgeId, int time );
 }

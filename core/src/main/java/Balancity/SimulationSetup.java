@@ -31,8 +31,8 @@ public class SimulationSetup
     ArrayList<GHPoint> sources, destinations;
     GHPoint a2_south_in= new GHPoint(52.222376, 4.986595);
     GHPoint a2_south_out = new GHPoint(52.222291, 4.985683);
-    GHPoint a4_south_west_in = new GHPoint(52.206032, 4.620566);
-    GHPoint a4_south_west_out = new GHPoint(52.206100, 4.620024);
+    GHPoint a4_south_west_in = new GHPoint(52.20969489819195, 4.623870849609375);
+    GHPoint a4_south_west_out = new GHPoint(52.21101098, 4.62421417);
     GHPoint a44_west_in = new GHPoint(52.221418, 4.542734);
     GHPoint a44_west_out = new GHPoint(52.221515, 4.542645);
     GHPoint a9_north_in = new GHPoint(52.522346, 4.719106);
@@ -45,8 +45,8 @@ public class SimulationSetup
     GHPoint n247_north_east_out = new GHPoint(52.518845, 5.044302); //Alternative path from Afsluitdijk
     GHPoint a6_east_in = new GHPoint(52.353025, 5.204856); //Almere
     GHPoint a6_east_out = new GHPoint(52.352809, 5.204910);
-    GHPoint a1_south_east_in = new GHPoint(52.253760, 5.210795);
-    GHPoint a1_south_east_out = new GHPoint(52.253746, 5.210620);
+    GHPoint a1_south_east_in = new GHPoint(52.26264780, 5.20870506);
+    GHPoint a1_south_east_out = new GHPoint(52.2621126, 5.20872116);
     
     GHPoint Amsterdam_arena = new GHPoint(52.313722, 4.940938); //Football stadion parking
     GHPoint central_station = new GHPoint(52.378151, 4.899816); 

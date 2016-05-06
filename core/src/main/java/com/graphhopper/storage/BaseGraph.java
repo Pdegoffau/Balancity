@@ -1181,6 +1181,15 @@ class BaseGraph implements Graph
         {
             return edgeAccess.getDist(edgePointer);
         }
+        
+        @Override
+        public final int getTrafficCount(int time){
+            return edgeAccess.getTrafficCount(edgeId, time);
+        }
+        
+        public void setTrafficCount(int trafficCount, int time){
+            edgeAccess.setTrafficCount(edgeId, time, trafficCount);
+        }
 
         @Override
         public final EdgeIteratorState setDistance( double dist )

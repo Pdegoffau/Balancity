@@ -237,6 +237,7 @@ public class Path
         EdgeIteratorState iter = graph.getEdgeIteratorState(edgeId, adjNode);
         double dist = iter.getDistance();
         distance += dist;
+        iter.setTrafficCount(iter.getTrafficCount((int)(distance))+1, (int)(distance));
         time += calcMillis(dist, iter.getFlags(), false);
         addEdge(edgeId);
     }

@@ -497,6 +497,18 @@ public class GHUtility
         {
             throw new UnsupportedOperationException("Not supported. Edge is empty.");
         }
+
+        @Override
+        public int getTrafficCount( int time )
+        {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+
+        @Override
+        public void setTrafficCount( int trafficCnt, int time )
+        {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
     };
 
     /**

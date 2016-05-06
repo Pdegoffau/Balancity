@@ -54,15 +54,15 @@ public class Balancity
         int i =0;
         for (VehicleUnit item:loaded_instance)
         {
-            GHRequest routerequest = new GHRequest(item.getOrigin(),item.getDestination()).setAlgorithm("dijkstrabi");//new GHRequest(latFrom, lonFrom, latTo, lonTo);
+            GHRequest routerequest = new GHRequest(item.getOrigin(),item.getDestination()).setAlgorithm("dijkstra").setWeighting("balanced");//new GHRequest(latFrom, lonFrom, latTo, lonTo);
             GHResponse ans = hopper.route(routerequest);
 
             PathWrapper path = ans.getBest();
             if(!path.hasErrors()){
             PointList points = path.getPoints();
             InstructionList instr = path.getInstructions();
-            System.out.println("Distance: " + path.getTime());
-            //FileUtils.writeStringToFile(new File("testfiles/test" + i + ".gpx"), instr.createGPX("" +i,2));
+            System.out.println("Distance for route "+i+": " + path.getTime());
+            FileUtils.writeStringToFile(new File("C:/xampp/htdocs/testfiles/test" + i + ".gpx"), instr.createGPX(""+i, 0, false, false, true, false));
 
             
             for (GHPoint p : points)
