@@ -16,10 +16,10 @@
 
 package Balancity;
 
+import com.graphhopper.routing.QueryGraph;
 import com.graphhopper.routing.util.AllEdgesIterator;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
+import com.graphhopper.storage.NodeAccess;
+import java.io.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -40,18 +40,22 @@ public class TrafficData
         {
             writer = new PrintWriter(filepath, "UTF-8");
             AllEdgesIterator iter = graphhopper.getGraphHopperStorage().getAllEdges();
-            int tfCount =0,edgeId =0;
+            int tfCount =0;
+            QueryGraph qg = new QueryGraph(graphhopper.getGraphHopperStorage().getBaseGraph());
+            NodeAccess pa = qg.getNodeAccess();
             while(iter.next())
             {
+                    double latf= pa.getLat(iter.getBaseNode());
+                    double lonf = pa.getLon(iter.getBaseNode());
+                    double latt = pa.getLat(iter.getAdjNode());
+                    double lont = pa.getLon(iter.getAdjNode());
                 for(int time=0;time<MAX_TIME; time= time+1)
                 {
-                    edgeId = iter.getEdge();
                     tfCount = iter.getTrafficCount(time);
                     if(tfCount>0)
-                    writer.println(edgeId+":"+time+";"+tfCount);
+                    writer.println(latf+";"+lonf+";"+latt+";"+lont+";"+time+";"+tfCount);
                 }
             }
-            writer.close();
         } catch (FileNotFoundException ex)
         {
             Logger.getLogger(TrafficData.class.getName()).log(Level.SEVERE, null, ex);

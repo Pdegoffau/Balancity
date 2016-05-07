@@ -46,10 +46,10 @@ public class Balancity
                 setOSMFile(testOsm).setCHEnable(false);
         hopper.importOrLoad();
 
-        int num_iterations = 200;
+        int num_iterations = 10000;
         SimulationSetup sim = new SimulationSetup();
-        //ArrayList<VehicleUnit> instance = sim.generateInstance(num_iterations, 10);
-        //sim.saveInstance(instance, "testSave.txt");
+        ArrayList<VehicleUnit> instance = sim.generateInstance(num_iterations, 10);
+        sim.saveInstance(instance, "testSave.txt");
         ArrayList<VehicleUnit> loaded_instance = sim.loadInstance("testSave.txt");
         
         int i =0;
