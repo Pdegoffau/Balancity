@@ -253,12 +253,20 @@ public abstract class AbstractDataAccess implements DataAccess
     @Override
     public void setTrfCnt( int edgeId, int time, int trafficCount )
     {
-        if (edgeIdToTFCcount.containsKey(edgeId))
+        if (trafficCount > 0)
         {
-            ((HashMap) edgeIdToTFCcount.get(edgeId)).put(time, trafficCount);
+            if (edgeIdToTFCcount.containsKey(edgeId))
+            {
+                ((HashMap) edgeIdToTFCcount.get(edgeId)).put(time, trafficCount);
+            } else
+            {
+                HashMap<Integer, Integer> hM = new HashMap();
+                hM.put(time, trafficCount);
+                edgeIdToTFCcount.put(edgeId, hM);
+            }
         } else
         {
-            edgeIdToTFCcount.put(edgeId, new HashMap(time, trafficCount));
+            System.out.println("Don't store negative trafficCount!");
         }
     }
 

@@ -18,6 +18,7 @@
 package com.graphhopper.routing;
 
 import Balancity.TDSPTEntry;
+import Balancity.TimeConversion;
 import com.graphhopper.routing.util.DefaultEdgeFilter;
 import com.graphhopper.routing.util.FlagEncoder;
 import com.graphhopper.storage.*;
@@ -35,7 +36,7 @@ import java.util.*;
  * @author Ottavio Campana
  * @author jan soe
  */
-public class Path
+public class Path implements TimeConversion
 {
     private static final AngleCalc ac = new AngleCalc();
     private List<String> description;
@@ -251,7 +252,6 @@ public class Path
      */
     private void processEdge(TDSPTEntry edge )
     {
-        EdgeIteratorState iter = graph.getEdgeIteratorState(edge.edge, edge.adjNode);
         double dist = edge.weight;
         distance += dist;
         time += edge.time;
@@ -264,11 +264,13 @@ public class Path
      * @param endTime the time at which the emd of this edge is reached
      * @return the time for this route segment
      */
-    public long updateTrafficEdge(TDSPTEntry edge,long endTime)
+    public int updateTrafficEdge(TDSPTEntry edge,int endTime)
     {
         EdgeIteratorState iter = graph.getEdgeIteratorState(edge.edge, edge.adjNode);
-        iter.setTrafficCount(iter.getTrafficCount((int)endTime-(int)(edge.time))+1, (int)endTime-(int)(edge.time));
-        return (long) edge.time;
+        int atTime= convertToFrame(60*(int)endTime-(int)edge.time);
+        int oldTrafficCount = iter.getTrafficCount(atTime);
+        iter.setTrafficCount(oldTrafficCount+1, atTime);
+        return (int)edge.time;
     }
     
     /**
@@ -278,11 +280,11 @@ public class Path
      */
     public void updateTraffic(TDSPTEntry edge, long totalTime){
         TDSPTEntry goalEdge = tdsptEntry;
-        //setEndNode(goalEdge.adjNode);
-        long tmp_time = totalTime;
+        setEndNode(goalEdge.adjNode);
+        int tmp_time = (int)totalTime;
         while (EdgeIterator.Edge.isValid(goalEdge.edge))
         {
-            tmp_time = tmp_time - updateTrafficEdge(goalEdge,tmp_time);
+            tmp_time = tmp_time - updateTrafficEdge(goalEdge,convertToFrame(tmp_time));
             goalEdge = goalEdge.parent;
         }
     }
@@ -306,6 +308,12 @@ public class Path
             throw new IllegalStateException("Speed cannot be 0 for unblocked edge, use access properties to mark edge blocked! Should only occur for shortest path calculation. See #242.");
 
         return (long) (distance * 3600 / speed);
+    }
+
+    @Override
+    public int convertToFrame( int time )
+    {
+        return time /60;
     }
 
     /**

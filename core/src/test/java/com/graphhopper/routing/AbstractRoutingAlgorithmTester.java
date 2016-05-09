@@ -783,6 +783,12 @@ public abstract class AbstractRoutingAlgorithmTester
             {
                 return "custom";
             }
+
+            @Override
+            public double[] calcWeight( EdgeIteratorState iter, boolean reverse, int edgeId, int time )
+            {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
         };
 
         AlgorithmOptions opts = AlgorithmOptions.start().flagEncoder(carEncoder).weighting(defaultOpts.getWeighting()).build();

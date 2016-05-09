@@ -116,10 +116,17 @@ public abstract class AbstractRoutingAlgorithm implements RoutingAlgorithm
     protected abstract boolean isWeightLimitExceeded();
 
     @Override
-    public List<Path> calcPaths( int from, int to )
+    public List<Path> calcPaths( int from, int to)
     {
         return Collections.singletonList(calcPath(from, to));
     }
+    
+    @Override
+    public List<Path> calcPaths( int from, int to,int timeOffset)
+    {
+        return Collections.singletonList(calcPath(from, to));
+    }
+    
 
     protected Path createEmptyPath()
     {

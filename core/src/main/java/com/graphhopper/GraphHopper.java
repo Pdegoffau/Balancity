@@ -1153,7 +1153,7 @@ public class GraphHopper implements GraphHopperAPI
             String debug = ", algoInit:" + sw.stop().getSeconds() + "s";
 
             sw = new StopWatch().start();
-            List<Path> pathList = algo.calcPaths(fromQResult.getClosestNode(), toQResult.getClosestNode());
+            List<Path> pathList = algo.calcPaths(fromQResult.getClosestNode(), toQResult.getClosestNode(),request.getTimeOffset());
             debug += ", " + algo.getName() + "-routing:" + sw.stop().getSeconds() + "s";
             if (pathList.isEmpty())
                 throw new IllegalStateException("At least one path has to be returned for " + fromQResult + " -> " + toQResult);

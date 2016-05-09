@@ -36,6 +36,7 @@ import java.util.Locale;
 public class GHRequest
 {
     private String algo = "";
+    private int timeOffset =0;
     private final List<GHPoint> points;
     private final WeightingMap hints = new WeightingMap();
     private String vehicle = "";
@@ -281,5 +282,15 @@ public class GHRequest
     public WeightingMap getHints()
     {
         return hints;
+    }
+
+    public GHRequest setTimeOffset( int startTime )
+    {
+        this.timeOffset = startTime;
+        return this;
+    }
+    
+    public int getTimeOffset(){
+        return this.timeOffset;
     }
 }

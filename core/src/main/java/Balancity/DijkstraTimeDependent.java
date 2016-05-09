@@ -53,6 +53,8 @@ import com.graphhopper.storage.SPTEntry;
 import com.graphhopper.storage.Graph;
 import com.graphhopper.util.EdgeExplorer;
 import com.graphhopper.util.EdgeIterator;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Implements a single source shortest path algorithm
@@ -67,6 +69,7 @@ public class DijkstraTimeDependent extends AbstractRoutingAlgorithm
     protected TDSPTEntry currEdge;
     private int visitedNodes;
     private int to = -1;
+    private int timeOffset =0;
 
     public DijkstraTimeDependent( Graph g, FlagEncoder encoder, Weighting weighting, TraversalMode tMode )
     {
@@ -82,6 +85,26 @@ public class DijkstraTimeDependent extends AbstractRoutingAlgorithm
 
     @Override
     public Path calcPath( int from, int to )
+    {
+        checkAlreadyRun();
+        this.to = to;
+        currEdge = createTDSPTEntry(from, 0,0);
+        if (!traversalMode.isEdgeBased())
+        {
+            fromMap.put(from, currEdge);
+        }
+        runAlgo();
+        return extractPath();
+    }
+    
+    @Override
+    public List<Path> calcPaths( int from, int toId, int timeOffset )
+    {
+        this.timeOffset = timeOffset;
+        return Collections.singletonList(calcPath(from, toId));
+    }
+    
+    public Path calcPath( int from, int to, int timeOffset )
     {
         checkAlreadyRun();
         this.to = to;
@@ -111,7 +134,7 @@ public class DijkstraTimeDependent extends AbstractRoutingAlgorithm
                     continue;
 
                 int traversalId = traversalMode.createTraversalId(iter, false);
-                double[] tmpWeights = weighting.calcWeight(iter, false, currEdge.edge,(int)(currEdge.time));
+                double[] tmpWeights = weighting.calcWeight(iter, false, currEdge.edge,(int)(currEdge.time)+timeOffset);
                 double tmpWeight = tmpWeights[0] + currEdge.weight;
                 if (Double.isInfinite(tmpWeight))
                     continue;
@@ -164,7 +187,7 @@ public class DijkstraTimeDependent extends AbstractRoutingAlgorithm
             return createEmptyPath();
         }
         Path result = new Path(graph, flagEncoder).setWeight(currEdge.weight).setTDSPTEntry(currEdge).extract();
-        result.updateTraffic(currEdge, result.getTime());
+        result.updateTraffic(currEdge, result.getTime()+timeOffset);
         return result;
     }
 

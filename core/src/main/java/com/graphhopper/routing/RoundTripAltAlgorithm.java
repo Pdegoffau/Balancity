@@ -220,6 +220,12 @@ public class RoundTripAltAlgorithm implements RoutingAlgorithm
         return visitedNodes;
     }
 
+    @Override
+    public List<Path> calcPaths( int closestNode, int closestNode0, int timeOffset )
+    {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
     /**
      * Helper class for one to many dijkstra
      */

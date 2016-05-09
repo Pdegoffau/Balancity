@@ -57,4 +57,6 @@ public interface RoutingAlgorithm
      * Returns the visited nodes after searching. Useful for debugging.
      */
     int getVisitedNodes();
+
+    public List<Path> calcPaths( int closestNode, int closestNode0, int timeOffset );
 }

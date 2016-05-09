@@ -26,7 +26,7 @@ import com.graphhopper.util.EdgeIteratorState;
  *
  * @author Paul de Goffau
  */
-public class BalanceWeighting extends AbstractWeighting
+public class BalanceWeighting extends AbstractWeighting implements TimeConversion
 {
     private final double maxSpeed;
     protected final static double SPEED_CONV = 3.6;
@@ -74,14 +74,14 @@ public class BalanceWeighting extends AbstractWeighting
         
         res[1] = tmpWeight; //Time duration of edge
         int tfc;
-        tfc = edge.getTrafficCount(startTime);
+        tfc = edge.getTrafficCount(convertToFrame(startTime));
         
         /*
         if(tfc>0){
             System.out.println("Traffic count: "+tfc);
         }
         */
-        tmpWeight += tfc*10;
+        //tmpWeight += tfc*10;
 
         res[0] = tmpWeight; //Weight that is used for route choices
         return res;
@@ -99,6 +99,11 @@ public class BalanceWeighting extends AbstractWeighting
         return distance / maxSpeed;
     }
 
+    @Override
+    public int convertToFrame( int time )
+    {
+        return time /60;
+    }
 
     
 }

@@ -199,6 +199,12 @@ public class AlternativeRoute implements RoutingAlgorithm
         return visitedNodes;
     }
 
+    @Override
+    public List<Path> calcPaths( int closestNode, int closestNode0, int timeOffset )
+    {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
     public static class AlternativeInfo
     {
         private final double sortBy;

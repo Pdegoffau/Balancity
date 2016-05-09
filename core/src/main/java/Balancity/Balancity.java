@@ -46,16 +46,16 @@ public class Balancity
                 setOSMFile(testOsm).setCHEnable(false);
         hopper.importOrLoad();
 
-        int num_iterations = 10;
+        int num_iterations = 10000;
         SimulationSetup sim = new SimulationSetup();
-        ArrayList<VehicleUnit> instance = sim.generateInstance(num_iterations, 0);
+        ArrayList<VehicleUnit> instance = sim.generateInstance(num_iterations, 3000);
         sim.saveInstance(instance, "testSave.txt");
         ArrayList<VehicleUnit> loaded_instance = sim.loadInstance("testSave.txt");
         
         int i =0;
         for (VehicleUnit item:loaded_instance)
         {
-            GHRequest routerequest = new GHRequest(item.getOrigin(),item.getDestination()).setAlgorithm("dijkstraTimeDependent").setWeighting("balanced");//new GHRequest(latFrom, lonFrom, latTo, lonTo);
+            GHRequest routerequest = new GHRequest(item.getOrigin(),item.getDestination()).setAlgorithm("dijkstraTimeDependent").setWeighting("balanced").setTimeOffset(item.getStartTime());//new GHRequest(latFrom, lonFrom, latTo, lonTo);
             GHResponse ans = hopper.route(routerequest);
 
             PathWrapper path = ans.getBest();
