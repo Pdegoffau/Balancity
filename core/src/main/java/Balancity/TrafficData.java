@@ -29,7 +29,7 @@ import java.util.logging.Logger;
  */
 public class TrafficData
 {
-    private int MAX_TIME = 3000;
+    private int MAX_TIME = 6000;
     public TrafficData(){
         
     }
@@ -40,6 +40,7 @@ public class TrafficData
         {
             writer = new PrintWriter(filepath, "UTF-8");
             AllEdgesIterator iter = graphhopper.getGraphHopperStorage().getAllEdges();
+            System.out.println("Number of edges" + iter.toString());
             int tfCount =0;
             QueryGraph qg = new QueryGraph(graphhopper.getGraphHopperStorage().getBaseGraph());
             NodeAccess pa = qg.getNodeAccess();

@@ -81,7 +81,7 @@ public class BalanceWeighting extends AbstractWeighting
             System.out.println("Traffic count: "+tfc);
         }
         */
-        tmpWeight += tfc*3;
+        tmpWeight += tfc*10;
 
         res[0] = tmpWeight; //Weight that is used for route choices
         return res;

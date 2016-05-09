@@ -163,7 +163,9 @@ public class DijkstraTimeDependent extends AbstractRoutingAlgorithm
         if (currEdge == null || isWeightLimitExceeded() || !finished()){
             return createEmptyPath();
         }
-        return new Path(graph, flagEncoder).setWeight(currEdge.weight).setTDSPTEntry(currEdge).extract();
+        Path result = new Path(graph, flagEncoder).setWeight(currEdge.weight).setTDSPTEntry(currEdge).extract();
+        result.updateTraffic(currEdge, result.getTime());
+        return result;
     }
 
     @Override
