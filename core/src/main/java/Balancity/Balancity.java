@@ -40,6 +40,7 @@ public class Balancity
         String testGPX = "C:/xampp/htdocs/testfiles/test";
         String trafficTxt = "C:/xampp/htdocs/trafficData.txt";
         String trafficJSON = "C:/xampp/htdocs/traffic.json";
+        String trafficJSONTime =  "C:/xampp/htdocs/orderedTraffic.json";
 
         BalanceHopper hopper = (BalanceHopper) new BalanceHopper().setStoreOnFlush(true).
                 setEncodingManager(new EncodingManager("CAR")).
@@ -75,6 +76,7 @@ public class Balancity
         TrafficData dt = new TrafficData();
         dt.saveTrafficToTextFile(hopper, trafficTxt);
         dt.saveTrafficToJSON(hopper, trafficJSON);
+        dt.saveTrafficOrderedByTime(hopper, trafficJSONTime);
 
         /*        for(Instruction instruction : instr) {
          System.out.println(instruction.toString());

@@ -20,6 +20,8 @@ import com.graphhopper.routing.util.AllEdgesIterator;
 import com.graphhopper.storage.NodeAccess;
 import com.graphhopper.util.PointList;
 import java.io.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -82,8 +84,7 @@ public class TrafficData
             AllEdgesIterator iter = graphhopper.getGraphHopperStorage().getAllEdges();
             int tfCount = 0;
             QueryGraph qg = new QueryGraph(graphhopper.getGraphHopperStorage().getBaseGraph());
-            NodeAccess pa = qg.getNodeAccess();
-            int counter =0;
+            int counter = 0;
             while (iter.next())
             {
                 PointList pl = iter.fetchWayGeometry(1);
@@ -93,13 +94,92 @@ public class TrafficData
                     if (tfCount > 0)
                         for (int j = 0; j < (pl.size() - 1); j++)
                         {
-                            if(counter>0)
+                            if (counter > 0)
                             {
                                 writer.print(",\n");
                             }
                             writer.print("{\"latFrom\":" + pl.getLat(j) + ",\"lonFrom\":" + pl.getLon(j) + ",\"latTo\":" + pl.getLat(j + 1) + ",\"lonTo\":" + pl.getLon(j + 1) + ",\"time\":" + time + ",\"trafficCount\":" + tfCount + "}");
                             counter++;
                         }
+                }
+            }
+            writer.println("\n]}");
+        } catch (FileNotFoundException ex)
+        {
+            Logger.getLogger(TrafficData.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (UnsupportedEncodingException ex)
+        {
+            Logger.getLogger(TrafficData.class.getName()).log(Level.SEVERE, null, ex);
+        } finally
+        {
+            writer.close();
+        }
+    }
+
+    public HashMap retrieveData( BalanceHopper hopper )
+    {
+        AllEdgesIterator iter = hopper.getGraphHopperStorage().getAllEdges();
+        int tfCount = 0;
+        HashMap drop = new HashMap<Integer, ArrayList<TrafficEntry>>();
+        while (iter.next())
+        {
+            PointList pl = iter.fetchWayGeometry(1);
+            for (int time = 0; time < MAX_TIME; time = time + 1)
+            {
+                tfCount = iter.getTrafficCount(time);
+                if (tfCount > 0)
+                {
+                    ArrayList<TrafficEntry> additions;
+                    if(drop.containsKey(time)){
+                        additions = (ArrayList<TrafficEntry>) drop.get(time);
+                    }
+                    else
+                        additions = new ArrayList<TrafficEntry>();
+
+                    for (int j = 0; j < (pl.size() - 1); j++)
+                    {
+                        additions.add(new TrafficEntry(pl.getLat(j), pl.getLon(j), pl.getLat(j + 1), pl.getLon(j + 1), tfCount));
+                    }
+                    drop.put(time, additions);
+                }
+            }
+        }
+        return drop;
+    }
+
+    public void saveTrafficOrderedByTime( BalanceHopper graphhopper, String filepath )
+    {
+        HashMap data = retrieveData(graphhopper);
+        PrintWriter writer = null;
+        try
+        {
+            writer = new PrintWriter(filepath, "UTF-8");
+            writer.println("{\"traffic\": [");
+            for (int j = 0; j < data.size(); j++)
+            {
+                writer.println("{\"time\":"+j);
+
+                if(data.containsKey(j)){
+                ArrayList<TrafficEntry> atTime = (ArrayList<TrafficEntry>)data.get(j);
+                for (int i = 0; i < atTime.size(); i++)
+                {
+                    TrafficEntry entry = atTime.get(i);
+                    if (i != atTime.size() - 1)
+                    {
+                        writer.println("{\"latFrom\":" + entry.getLatFrom() + ",\"lonFrom\":" + entry.getLonFrom() + ",\"latTo\":" + entry.getLatTo() + ",\"lonTo\":" + entry.getLonTo() + ",\"trafficCount\":" + entry.getTrafficCount() + "},");
+                    } else
+                    {
+                        writer.println("{\"latFrom\":" + entry.getLatFrom() + ",\"lonFrom\":" + entry.getLonFrom() + ",\"latTo\":" + entry.getLatTo() + ",\"lonTo\":" + entry.getLonTo() + ",\"trafficCount\":" + entry.getTrafficCount() + "}");
+                    }
+                }
+
+                if (j != data.size() - 1)
+                {
+                    writer.println("},");
+                } else
+                {
+                    writer.println("}");
+                }
                 }
             }
             writer.println("\n]}");
