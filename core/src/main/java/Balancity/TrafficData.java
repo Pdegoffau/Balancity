@@ -157,30 +157,31 @@ public class TrafficData
             writer.println("{\"traffic\": [");
             for (int j = 0; j < data.size(); j++)
             {
-                writer.println("{\"time\":"+j);
-
-                if(data.containsKey(j)){
-                ArrayList<TrafficEntry> atTime = (ArrayList<TrafficEntry>)data.get(j);
-                for (int i = 0; i < atTime.size(); i++)
+                if(data.containsKey(j))
                 {
-                    TrafficEntry entry = atTime.get(i);
-                    if (i != atTime.size() - 1)
+                    writer.println("{\"time\": [");
+                    ArrayList<TrafficEntry> atTime = (ArrayList<TrafficEntry>)data.get(j);
+                    for (int i = 0; i < atTime.size(); i++)
                     {
-                        writer.println("{\"latFrom\":" + entry.getLatFrom() + ",\"lonFrom\":" + entry.getLonFrom() + ",\"latTo\":" + entry.getLatTo() + ",\"lonTo\":" + entry.getLonTo() + ",\"trafficCount\":" + entry.getTrafficCount() + "},");
+                        TrafficEntry entry = atTime.get(i);
+                        if (i != atTime.size() - 1)
+                        {
+                            writer.println("{\"latFrom\":" + entry.getLatFrom() + ",\"lonFrom\":" + entry.getLonFrom() + ",\"latTo\":" + entry.getLatTo() + ",\"lonTo\":" + entry.getLonTo() + ",\"trafficCount\":" + entry.getTrafficCount() + "},");
+                        } else
+                        {
+                            writer.println("{\"latFrom\":" + entry.getLatFrom() + ",\"lonFrom\":" + entry.getLonFrom() + ",\"latTo\":" + entry.getLatTo() + ",\"lonTo\":" + entry.getLonTo() + ",\"trafficCount\":" + entry.getTrafficCount() + "}");
+                        }
+                    }
+
+                    if (j != data.size() - 1)
+                    {
+                        writer.println("]},");
                     } else
                     {
-                        writer.println("{\"latFrom\":" + entry.getLatFrom() + ",\"lonFrom\":" + entry.getLonFrom() + ",\"latTo\":" + entry.getLatTo() + ",\"lonTo\":" + entry.getLonTo() + ",\"trafficCount\":" + entry.getTrafficCount() + "}");
+                        writer.println("]}");
                     }
                 }
 
-                if (j != data.size() - 1)
-                {
-                    writer.println("},");
-                } else
-                {
-                    writer.println("}");
-                }
-                }
             }
             writer.println("\n]}");
         } catch (FileNotFoundException ex)

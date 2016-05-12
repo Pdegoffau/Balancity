@@ -81,7 +81,7 @@ public class BalanceWeighting extends AbstractWeighting implements TimeConversio
             System.out.println("Traffic count: "+tfc);
         }
         */
-        //tmpWeight += tfc*10;
+        tmpWeight += tfc*3;
 
         res[0] = tmpWeight; //Weight that is used for route choices
         return res;
