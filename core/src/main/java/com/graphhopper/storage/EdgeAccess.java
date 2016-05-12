@@ -77,11 +77,11 @@ abstract class EdgeAccess
         edges.setInt(edgePointer + E_DIST, distToInt(distance));
     }
     
-    final void setTrafficCount(int edgeOrShortcutId, int time, int trafficCount){
+    final void setTrafficCount(int edgeOrShortcutId, int time, double trafficCount){
         edges.setTrfCnt(edgeOrShortcutId,time,trafficCount);
     }
     
-    final int getTrafficCount(int edgeOrShortcutId, int time){
+    final double getTrafficCount(int edgeOrShortcutId, int time){
         return edges.getTrfCnt(edgeOrShortcutId, time);
     }
 

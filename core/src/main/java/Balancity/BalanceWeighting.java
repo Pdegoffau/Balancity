@@ -73,7 +73,7 @@ public class BalanceWeighting extends AbstractWeighting implements TimeConversio
             tmpWeight += PENALTY;
         
         res[1] = tmpWeight; //Time duration of edge
-        int tfc;
+        double tfc;
         tfc = edge.getTrafficCount(convertToFrame(startTime));
         
         /*

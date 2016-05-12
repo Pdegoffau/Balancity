@@ -253,19 +253,19 @@ public class VirtualEdgeIteratorState implements EdgeIteratorState, CHEdgeIterat
     }
 
     @Override
-    public int getTrafficCount( int time )
+    public double getTrafficCount( int time )
     {//FIXME: Check if this must be implemented.
         /*
         if(time<MAX_TIME){
         return this.trafficCnt[time];
         }
         else*/
-        return 0;
+        return 0.0;
             
     }
 
     @Override
-    public void setTrafficCount( int trafficCnt, int time )
+    public void setTrafficCount( double trafficCnt, int time )
     {
         //FIXME: Check if this must be implemented.
         //do nothing

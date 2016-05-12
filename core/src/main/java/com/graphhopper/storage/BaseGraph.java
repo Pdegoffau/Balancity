@@ -1183,11 +1183,11 @@ class BaseGraph implements Graph
         }
         
         @Override
-        public final int getTrafficCount(int time){
+        public final double getTrafficCount(int time){
             return edgeAccess.getTrafficCount(edgeId, time);
         }
         
-        public void setTrafficCount(int trafficCount, int time){
+        public void setTrafficCount(double trafficCount, int time){
             edgeAccess.setTrafficCount(edgeId, time, trafficCount);
         }
 

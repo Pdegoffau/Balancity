@@ -26,9 +26,9 @@ public class TrafficEntry
     private double lonFrom;
     private double latTo;
     private double lonTo;
-    private int trafficCount;
+    private double trafficCount;
     
-    public TrafficEntry(double latFrom, double lonFrom, double latTo, double lonTo, int trafficCount){
+    public TrafficEntry(double latFrom, double lonFrom, double latTo, double lonTo, double trafficCount){
         this.latFrom = latFrom;
         this.lonFrom = lonFrom;
         this.latTo = latTo;
@@ -56,7 +56,7 @@ public class TrafficEntry
         return lonTo;
     }
 
-    public int getTrafficCount()
+    public double getTrafficCount()
     {
         return trafficCount;
     }            

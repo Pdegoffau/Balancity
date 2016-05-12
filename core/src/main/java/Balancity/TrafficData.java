@@ -46,7 +46,7 @@ public class TrafficData
         {
             writer = new PrintWriter(filepath, "UTF-8");
             AllEdgesIterator iter = graphhopper.getGraphHopperStorage().getAllEdges();
-            int tfCount = 0;
+            double tfCount = 0.0;
             QueryGraph qg = new QueryGraph(graphhopper.getGraphHopperStorage().getBaseGraph());
             NodeAccess pa = qg.getNodeAccess();
             while (iter.next())
@@ -82,7 +82,7 @@ public class TrafficData
             writer = new PrintWriter(filepath, "UTF-8");
             writer.println("{\"traffic\": [");
             AllEdgesIterator iter = graphhopper.getGraphHopperStorage().getAllEdges();
-            int tfCount = 0;
+            double tfCount = 0.0;
             QueryGraph qg = new QueryGraph(graphhopper.getGraphHopperStorage().getBaseGraph());
             int counter = 0;
             while (iter.next())
@@ -119,7 +119,7 @@ public class TrafficData
     public HashMap retrieveData( BalanceHopper hopper )
     {
         AllEdgesIterator iter = hopper.getGraphHopperStorage().getAllEdges();
-        int tfCount = 0;
+        double tfCount = 0;
         HashMap drop = new HashMap<Integer, ArrayList<TrafficEntry>>();
         while (iter.next())
         {

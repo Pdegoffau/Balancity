@@ -219,13 +219,13 @@ class VirtualEdgeIterator implements EdgeIterator, CHEdgeIteratorState
     }
 
     @Override
-    public int getTrafficCount( int time )
+    public double getTrafficCount( int time )
     {
         return edges.get(current).getTrafficCount(time);
     }
 
     @Override
-    public void setTrafficCount( int trafficCnt, int time )
+    public void setTrafficCount( double trafficCnt, int time )
     {
         edges.get(current).setTrafficCount(trafficCnt, time);
     }

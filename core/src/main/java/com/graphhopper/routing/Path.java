@@ -268,7 +268,7 @@ public class Path implements TimeConversion
     {
         EdgeIteratorState iter = graph.getEdgeIteratorState(edge.edge, edge.adjNode);
         int atTime= convertToFrame(60*(int)endTime-(int)edge.time);
-        int oldTrafficCount = iter.getTrafficCount(atTime);
+        double oldTrafficCount = iter.getTrafficCount(atTime);
         iter.setTrafficCount(oldTrafficCount+1, atTime);
         return (int)edge.time;
     }

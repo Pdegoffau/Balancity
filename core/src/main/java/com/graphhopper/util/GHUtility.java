@@ -499,13 +499,13 @@ public class GHUtility
         }
 
         @Override
-        public int getTrafficCount( int time )
+        public double getTrafficCount( int time )
         {
             throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
         }
 
         @Override
-        public void setTrafficCount( int trafficCnt, int time )
+        public void setTrafficCount( double trafficCnt, int time )
         {
             throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
         }

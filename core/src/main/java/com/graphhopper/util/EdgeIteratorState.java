@@ -76,9 +76,9 @@ public interface EdgeIteratorState
      */
     double getDistance();
     
-    int getTrafficCount(int time);
+    double getTrafficCount(int time);
     
-    void setTrafficCount(int trafficCnt, int time);
+    void setTrafficCount(double trafficCnt, int time);
 
     EdgeIteratorState setDistance( double dist );
 
