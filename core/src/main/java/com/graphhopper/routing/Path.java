@@ -267,9 +267,18 @@ public class Path implements TimeConversion
     public int updateTrafficEdge(TDSPTEntry edge,int endTime)
     {
         EdgeIteratorState iter = graph.getEdgeIteratorState(edge.edge, edge.adjNode);
-        int atTime= convertToFrame(60*(int)endTime-(int)edge.time);
-        double oldTrafficCount = iter.getTrafficCount(atTime);
-        iter.setTrafficCount(oldTrafficCount+1, atTime);
+        int atTime= convertToFrame(endTime-(int)edge.time);
+        int remainder = getRemainder(endTime-(int)edge.time);
+        double addA = (double)((60-remainder)/60.0);
+        double addB = (double)(remainder/60.0);
+        if(addA>0.0){
+            double oldTrafficCount = iter.getTrafficCount(atTime);
+            iter.setTrafficCount(oldTrafficCount+addA, atTime);
+        }
+        if(addB>0.0){
+            double oldTrafficCountRemainder = iter.getTrafficCount(atTime+1);
+            iter.setTrafficCount(oldTrafficCountRemainder+addB, atTime+1);
+        }
         return (int)edge.time;
     }
     
@@ -284,7 +293,7 @@ public class Path implements TimeConversion
         int tmp_time = (int)totalTime;
         while (EdgeIterator.Edge.isValid(goalEdge.edge))
         {
-            tmp_time = tmp_time - updateTrafficEdge(goalEdge,convertToFrame(tmp_time));
+            tmp_time = tmp_time - updateTrafficEdge(goalEdge,tmp_time);
             goalEdge = goalEdge.parent;
         }
     }
@@ -311,9 +320,14 @@ public class Path implements TimeConversion
     }
 
     @Override
-    public int convertToFrame( int time )
+    public int convertToFrame( int atTime )
     {
-        return time /60;
+        return atTime /60;
+    }
+
+    private int getRemainder( int atTime )
+    {
+        return atTime % 60;
     }
 
     /**

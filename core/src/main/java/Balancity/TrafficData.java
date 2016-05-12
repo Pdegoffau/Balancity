@@ -32,7 +32,7 @@ import java.util.logging.Logger;
  */
 public class TrafficData
 {
-    private int MAX_TIME = 100;
+    private int MAX_TIME = 700;
 
     public TrafficData()
     {
@@ -166,10 +166,10 @@ public class TrafficData
                         TrafficEntry entry = atTime.get(i);
                         if (i != atTime.size() - 1)
                         {
-                            writer.println("{\"latFrom\":" + entry.getLatFrom() + ",\"lonFrom\":" + entry.getLonFrom() + ",\"latTo\":" + entry.getLatTo() + ",\"lonTo\":" + entry.getLonTo() + ",\"trafficCount\":" + entry.getTrafficCount() + "},");
+                            writer.println("{\"time\":"+j+", \"latFrom\":" + entry.getLatFrom() + ",\"lonFrom\":" + entry.getLonFrom() + ",\"latTo\":" + entry.getLatTo() + ",\"lonTo\":" + entry.getLonTo() + ",\"trafficCount\":" + entry.getTrafficCount() + "},");
                         } else
                         {
-                            writer.println("{\"latFrom\":" + entry.getLatFrom() + ",\"lonFrom\":" + entry.getLonFrom() + ",\"latTo\":" + entry.getLatTo() + ",\"lonTo\":" + entry.getLonTo() + ",\"trafficCount\":" + entry.getTrafficCount() + "}");
+                            writer.println("{\"time\":"+j+", \"latFrom\":" + entry.getLatFrom() + ",\"lonFrom\":" + entry.getLonFrom() + ",\"latTo\":" + entry.getLatTo() + ",\"lonTo\":" + entry.getLonTo() + ",\"trafficCount\":" + entry.getTrafficCount() + "}");
                         }
                     }
 
