@@ -51,6 +51,7 @@ public class PMap
 
         for (String s : propertiesString.split("\\|"))
         {
+            System.out.println(s.indexOf("="));
             s = s.trim();
             int index = s.indexOf("=");
             if (index < 0)

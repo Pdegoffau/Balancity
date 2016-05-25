@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package Balancity;
+package Balancity.data;
 
 /**
  *

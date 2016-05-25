@@ -17,7 +17,7 @@
  */
 package com.graphhopper;
 
-import Balancity.BalanceWeighting;
+import Balancity.algorithms.BalanceWeighting;
 import com.graphhopper.reader.DataReader;
 import com.graphhopper.reader.OSMReader;
 import com.graphhopper.reader.dem.*;

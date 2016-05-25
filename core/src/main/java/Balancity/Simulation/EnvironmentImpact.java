@@ -14,13 +14,18 @@
  * limitations under the License.
  */
 
-package Balancity;
+package Balancity.Simulation;
 
 /**
  *
  * @author Paul de Goffau
  */
-public interface TimeConversion
+public interface EnvironmentImpact
 {
-    public int convertToFrame(int time);
+    /**
+     * 
+     * @param speed the speed in # kilometers per hour
+     * @return the emission of this vehicle at a certain speed
+     */
+    public double getEmission(int speed);
 }

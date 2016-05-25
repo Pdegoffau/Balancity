@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package Balancity;
+package Balancity.data;
 
+import Balancity.BalanceHopper;
 import com.graphhopper.routing.QueryGraph;
 import com.graphhopper.routing.util.AllEdgesIterator;
 import com.graphhopper.storage.NodeAccess;

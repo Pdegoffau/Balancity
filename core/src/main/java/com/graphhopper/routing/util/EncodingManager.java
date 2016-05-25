@@ -17,18 +17,12 @@
  */
 package com.graphhopper.routing.util;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import com.graphhopper.reader.OSMNode;
-import com.graphhopper.reader.OSMRelation;
-import com.graphhopper.reader.OSMWay;
-import com.graphhopper.storage.Directory;
-import com.graphhopper.storage.RAMDirectory;
-import com.graphhopper.storage.StorableProperties;
+import Balancity.Simulation.*;
+import com.graphhopper.reader.*;
+import com.graphhopper.storage.*;
 import com.graphhopper.util.EdgeIteratorState;
 import com.graphhopper.util.PMap;
+import java.util.*;
 
 /**
  * Manager class to register encoder, assign their flag values and check objects with all encoders
@@ -46,7 +40,10 @@ public class EncodingManager
     public static final String MOUNTAINBIKE = "mtb";
     public static final String FOOT = "foot";
     public static final String MOTORCYCLE = "motorcycle";
-
+    public static final String ELECTRIC_CAR = "electric_car";
+    public static final String NORMAL_CAR = "normal_car";
+    public static final String TRUCK = "truck";
+    
     private final List<AbstractFlagEncoder> edgeEncoders = new ArrayList<AbstractFlagEncoder>();
 
     private int nextWayBit = 0;
@@ -157,6 +154,16 @@ public class EncodingManager
 
             else if (entry.equals(MOTORCYCLE))
                 fe = new MotorcycleFlagEncoder(configuration);
+            
+            else if (entry.equals(NORMAL_CAR)){
+                fe = new NormalCarFlagEncoder(configuration);
+            }
+            
+            else if (entry.equals(ELECTRIC_CAR))
+                fe = new ElectricCarFlagEncoder(configuration);
+            
+            else if (entry.equals(TRUCK))
+                fe = new TruckFlagEncoder(configuration);
 
             else
                 throw new IllegalArgumentException("entry in encoder list not supported " + entry);

@@ -18,7 +18,7 @@
 package com.graphhopper.routing;
 
 import Balancity.TDSPTEntry;
-import Balancity.TimeConversion;
+import Balancity.data.TimeConversion;
 import com.graphhopper.routing.util.DefaultEdgeFilter;
 import com.graphhopper.routing.util.FlagEncoder;
 import com.graphhopper.storage.*;

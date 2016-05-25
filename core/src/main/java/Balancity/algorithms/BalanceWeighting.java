@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package Balancity;
+package Balancity.algorithms;
 
-import com.graphhopper.routing.util.AbstractWeighting;
-import com.graphhopper.routing.util.FlagEncoder;
-import com.graphhopper.routing.util.Weighting;
+import Balancity.data.TimeConversion;
+import com.graphhopper.routing.util.*;
 import com.graphhopper.util.EdgeIterator;
 import com.graphhopper.util.EdgeIteratorState;
 

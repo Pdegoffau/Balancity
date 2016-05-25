@@ -15,6 +15,9 @@
  */
 package Balancity;
 
+import Balancity.Simulation.SimulationSetup;
+import Balancity.Simulation.VehicleUnit;
+import Balancity.data.*;
 import com.graphhopper.*;
 import com.graphhopper.routing.util.*;
 import com.graphhopper.storage.index.LocationIndex;
@@ -38,8 +41,8 @@ public class Balancity
         String ghLoc = "target/balancity";
         String testOsm = "C:/Users/Paul de Goffau/Desktop/Master thesis/graphhopper/Amsterdam.osm.pbf";
         String testGPX = "C:/xampp/htdocs/testfiles/test";
-        String trafficTxt = "C:/xampp/htdocs/trafficData.txt";
-        String trafficJSON = "C:/xampp/htdocs/traffic.json";
+        //String trafficTxt = "C:/xampp/htdocs/trafficData.txt";
+        //String trafficJSON = "C:/xampp/htdocs/traffic.json";
         String trafficJSONTime =  "C:/xampp/htdocs/orderedTraffic.json";
 
         BalanceHopper hopper = (BalanceHopper) new BalanceHopper().setStoreOnFlush(true).
@@ -48,7 +51,7 @@ public class Balancity
                 setOSMFile(testOsm).setCHEnable(false);
         hopper.importOrLoad();
 
-        int num_iterations = 100;
+        int num_iterations = 10;
         SimulationSetup sim = new SimulationSetup();
         ArrayList<VehicleUnit> instance = sim.generateInstance(num_iterations, 3000);
         sim.saveInstance(instance, "testSave.txt");

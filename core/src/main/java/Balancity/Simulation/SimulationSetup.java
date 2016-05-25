@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package Balancity;
+package Balancity.Simulation;
 
 import com.graphhopper.util.shapes.GHPoint;
 import java.io.*;
