@@ -13,9 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package Balancity.Simulation;
 
+import Balancity.data.AveragedPostCode;
+import Balancity.data.PostCode;
+import com.graphhopper.GraphHopper;
 import com.graphhopper.util.shapes.GHPoint;
 import java.io.*;
 import java.util.ArrayList;
@@ -29,7 +31,7 @@ import java.util.logging.Logger;
 public class SimulationSetup
 {
     ArrayList<GHPoint> sources, destinations;
-    GHPoint a2_south_in= new GHPoint(52.222376, 4.986595);
+    GHPoint a2_south_in = new GHPoint(52.222376, 4.986595);
     GHPoint a2_south_out = new GHPoint(52.222291, 4.985683);
     GHPoint a4_south_west_in = new GHPoint(52.20969489819195, 4.623870849609375);
     GHPoint a4_south_west_out = new GHPoint(52.21101098, 4.62421417);
@@ -47,19 +49,20 @@ public class SimulationSetup
     GHPoint a6_east_out = new GHPoint(52.352809, 5.204910);
     GHPoint a1_south_east_in = new GHPoint(52.26264780, 5.20870506);
     GHPoint a1_south_east_out = new GHPoint(52.2621126, 5.20872116);
-    
+
     GHPoint Amsterdam_arena = new GHPoint(52.313722, 4.940938); //Football stadion parking
-    GHPoint central_station = new GHPoint(52.378151, 4.899816); 
+    GHPoint central_station = new GHPoint(52.378151, 4.899816);
     GHPoint schiphol_airport = new GHPoint(52.306986, 4.759697); //Parking Schiphol
     GHPoint zandvoort_racing = new GHPoint(52.387805, 4.544671); //Zandvoort circuit
     GHPoint rijksmuseum = new GHPoint(52.357194, 4.881610); // Parking nearby Rijksmuseum
     GHPoint offices = new GHPoint(52.400623, 4.836363); //Industry park Westpoort
     GHPoint molenwijk = new GHPoint(52.418934, 4.890091); //Residences north of Amsterdam
-    
-    public SimulationSetup(){
+
+    public SimulationSetup()
+    {
         this.sources = new ArrayList<GHPoint>();
         this.destinations = new ArrayList<GHPoint>();
-        
+
         this.sources.add(a2_south_in);
         this.sources.add(a4_south_west_in);
         this.sources.add(a44_west_in);
@@ -69,14 +72,14 @@ public class SimulationSetup
         this.sources.add(n247_north_east_in);
         this.sources.add(a6_east_in);
         this.sources.add(a1_south_east_in);
-        this.sources.add(Amsterdam_arena);
-        this.sources.add(central_station);
-        this.sources.add(schiphol_airport);
-        this.sources.add(zandvoort_racing);
-        this.sources.add(rijksmuseum);
-        this.sources.add(offices);
-        this.sources.add(molenwijk);
-        
+        //this.sources.add(Amsterdam_arena);
+        //this.sources.add(central_station);
+        //this.sources.add(schiphol_airport);
+        //this.sources.add(zandvoort_racing);
+        //this.sources.add(rijksmuseum);
+        //this.sources.add(offices);
+        //this.sources.add(molenwijk);
+
         this.destinations.add(a2_south_out);
         this.destinations.add(a4_south_west_out);
         this.destinations.add(a44_west_out);
@@ -86,39 +89,45 @@ public class SimulationSetup
         this.destinations.add(n247_north_east_out);
         this.destinations.add(a6_east_out);
         this.destinations.add(a1_south_east_out);
-        this.destinations.add(Amsterdam_arena);
-        this.destinations.add(central_station);
-        this.destinations.add(schiphol_airport);
-        this.destinations.add(zandvoort_racing);
-        this.destinations.add(rijksmuseum);
-        this.destinations.add(offices);
-        this.destinations.add(molenwijk);
+        //this.destinations.add(Amsterdam_arena);
+        //this.destinations.add(central_station);
+        //this.destinations.add(schiphol_airport);
+        //this.destinations.add(zandvoort_racing);
+        //this.destinations.add(rijksmuseum);
+        //this.destinations.add(offices);
+        //this.destinations.add(molenwijk);
     }
-    
-    public ArrayList<VehicleUnit> generateInstance(int num_items, int time_interval){
-        if(num_items<sources.size()*destinations.size()){
+
+    public ArrayList<VehicleUnit> generateInstance( int num_items, int time_interval )
+    {
+        if (num_items < sources.size() * destinations.size())
+        {
             System.err.println("Not every combination between sources and destination can be generated!");
         }
-        
+
         ArrayList<VehicleUnit> test_objects = new ArrayList<VehicleUnit>(num_items);
-        
-        while(test_objects.size()<num_items){
-            int s = (int) (Math.random()*(sources.size()-1));
-            int d = (int) (Math.random()*(destinations.size()-1));
-            int t = (int) (Math.random()*(time_interval+1));
-            if((!sources.get(s).equals(destinations.get(d)))&&(!tooClose(sources.get(s),destinations.get(d)))){
-                test_objects.add(new VehicleUnit(sources.get(s),destinations.get(d),t));
+
+        while (test_objects.size() < num_items)
+        {
+            int s = (int) (Math.random() * (sources.size() - 1));
+            int d = (int) (Math.random() * (destinations.size() - 1));
+            int t = (int) (Math.random() * (time_interval + 1));
+            if ((!sources.get(s).equals(destinations.get(d))) && (!tooClose(sources.get(s), destinations.get(d))))
+            {
+                test_objects.add(new VehicleUnit(sources.get(s), destinations.get(d), t));
             }
         }
 
         return test_objects;
     }
-    
-    public void saveInstance(ArrayList<VehicleUnit> instance, String filename){
+
+    public void saveInstance( ArrayList<VehicleUnit> instance, String filename )
+    {
         try
         {
             PrintWriter writer = new PrintWriter(filename, "UTF-8");
-            for(VehicleUnit vu:instance){
+            for (VehicleUnit vu : instance)
+            {
                 writer.println(vu.toString());
             }
             writer.close();
@@ -130,15 +139,18 @@ public class SimulationSetup
             Logger.getLogger(SimulationSetup.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
-    public ArrayList<VehicleUnit> loadInstance(String filename){
+
+    public ArrayList<VehicleUnit> loadInstance( String filename )
+    {
         ArrayList<VehicleUnit> res = new ArrayList<VehicleUnit>();
-        try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(filename)))
+        {
             String line;
-            while ((line = br.readLine()) != null) {
-               String[] splitted = line.split(";");
-               VehicleUnit vu = new VehicleUnit(new GHPoint(Double.parseDouble(splitted[0].split(", ")[0]),Double.parseDouble(splitted[0].split(", ")[1])),new GHPoint(Double.parseDouble(splitted[1].split(", ")[0]),Double.parseDouble(splitted[1].split(", ")[1])),Integer.parseInt(splitted[2]));
-               res.add(vu);
+            while ((line = br.readLine()) != null)
+            {
+                String[] splitted = line.split(";");
+                VehicleUnit vu = new VehicleUnit(new GHPoint(Double.parseDouble(splitted[0].split(", ")[0]), Double.parseDouble(splitted[0].split(", ")[1])), new GHPoint(Double.parseDouble(splitted[1].split(", ")[0]), Double.parseDouble(splitted[1].split(", ")[1])), Integer.parseInt(splitted[2]));
+                res.add(vu);
             }
             br.close();
         } catch (FileNotFoundException ex)
@@ -152,22 +164,124 @@ public class SimulationSetup
     }
 
     /**
-     * This method determines if two GPS coordinates are to close to each others to be used for vehicle simulation
+     * This method determines if two GPS coordinates are to close to each others to be used for
+     * vehicle simulation
+     * <p>
      * @param s point 1
      * @param d point 2
-     * @return true if points are within have euclidean distance < 0.001 
+     * @return true if points are within have euclidean distance < 0.001
      */
-    private boolean tooClose( GHPoint s, GHPoint d)
+    private boolean tooClose( GHPoint s, GHPoint d )
     {
-        double dis_lon = Math.abs(s.getLon()-d.getLon());
-        double dis_lat = Math.abs(s.getLat()-d.getLat());
-        if(Math.sqrt(Math.pow(dis_lat, 2) + Math.pow(dis_lon, 2)) <0.001)
+        double dis_lon = Math.abs(s.getLon() - d.getLon());
+        double dis_lat = Math.abs(s.getLat() - d.getLat());
+        if (Math.sqrt(Math.pow(dis_lat, 2) + Math.pow(dis_lon, 2)) < 0.001)
         {
             return true;
-        }
-        else
+        } else
         {
             return false;
         }
+    }
+
+    public ArrayList<VehicleUnit> generateOVINInstance( String file, GraphHopper hopper )
+    {
+        AveragedPostCode pc = new AveragedPostCode("C:/Users/Paul de Goffau/Desktop/Master thesis/convertPostcode/AveragedPostcodes.txt");
+        ArrayList<VehicleUnit> test_objects = new ArrayList<VehicleUnit>();
+        try (BufferedReader br = new BufferedReader(new FileReader(file)))
+        {
+            String line;
+            line = br.readLine(); // skip header
+            int counter = 0;
+            while ((line = br.readLine()) != null)
+            {
+                String[] entries = line.split(";");
+                if (entries[141].length() > 0)
+                {
+                    int wayOfTraveling = Integer.parseInt(entries[141]);
+                    if ((wayOfTraveling == 10 || wayOfTraveling == 6))
+                    { // car driver or passenger
+                        String fromPC = entries[80];
+                        String toPC = entries[85];
+                        GHPoint realFrom = pc.getGPS(fromPC);
+                        GHPoint realTo = pc.getGPS(toPC);
+                        GHPoint chosenFrom = realFrom;
+                        GHPoint chosenTo = realTo;
+
+                        boolean start = false;
+                        boolean end = false;
+                        if (realFrom != null && realTo != null)
+                        {
+                            start = pc.PointInMap(realFrom, hopper);
+                            end = pc.PointInMap(realTo, hopper);
+                            if (start && end)
+                            {
+                                //Do nothing special
+                            } else if (start)
+                            {
+                                //TODO: implement something with the intersection
+                                //Map endpoint to the closest road at borders of map
+                                GHPoint closest = destinations.get(0);
+                                for (int i=1; i<destinations.size();i++)
+                                {
+                                    if (realTo.distanceTo(closest) > realTo.distanceTo(destinations.get(i)))
+                                    {
+                                        closest = destinations.get(i);
+                                    }
+                                }
+                                chosenTo = closest;
+                            } else if (end)
+                            {
+                                //TODO: implement something with the intersection
+                                //Map startpoint to the closest road at borders of map
+                                GHPoint closest = sources.get(0);
+                                for (int i=1; i<sources.size(); i++)
+                                {
+                                    if (realFrom.distanceTo(closest) > realFrom.distanceTo(sources.get(i)))
+                                    {
+                                        closest = sources.get(i);
+                                    }
+                                }
+                                chosenFrom = closest;
+                            }
+                            else
+                            {
+                                ArrayList<GHPoint> intersections = hopper.getGraphHopperStorage().getBounds().intersect(realFrom, realTo);
+                                if(intersections.size() > 0){
+                                    if(intersections.get(0).distanceTo(intersections.get(1))>10){
+                                        if(realFrom.distanceTo(intersections.get(0))<realFrom.distanceTo(intersections.get(1)))
+                                        {
+                                            chosenFrom = intersections.get(0);
+                                            chosenTo = intersections.get(1);
+                                        }
+                                        else
+                                        {
+                                            chosenFrom = intersections.get(1);
+                                            chosenTo = intersections.get(0);
+                                        }
+                                    }else{continue;}
+                                }else{continue;}
+                                
+                            }
+                            if(chosenFrom.distanceTo(chosenTo)>1){
+                                System.out.println("From PC: " + fromPC + " GPS: " + chosenFrom + " to PC: " + toPC + " GPS: " + chosenTo);
+                                int startTime = Integer.parseInt(entries[96]) * 60 * 60 + Integer.parseInt(entries[97]) * 60;
+                                test_objects.add(new VehicleUnit(chosenFrom, chosenTo, startTime));
+                                counter++;
+                            }
+                        }
+                    }
+                }
+                
+            }
+            System.out.println("Number of cars: " + counter);
+        } catch (FileNotFoundException ex)
+        {
+            System.err.println(ex.getMessage());
+        } catch (IOException ex)
+        {
+            System.err.println(ex.getMessage());
+        }
+        return test_objects;
     }
 }

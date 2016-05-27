@@ -174,6 +174,45 @@ public class BBox implements Shape, Cloneable
         //  && (o.maxLat < maxLat && o.maxLat >= minLat || o.maxLat >= maxLat && o.minLat < maxLat);
         return minLon < o.maxLon && minLat < o.maxLat && o.minLon < maxLon && o.minLat < maxLat;
     }
+    
+    public ArrayList<GHPoint> intersect(GHPoint source, GHPoint destination){
+        ArrayList<GHPoint> intersections = new ArrayList<>(2);
+        double dx, dy, y,x,m,b,c;
+        dy = destination.lat - source.lat;
+        dx = destination.lon - source.lon;
+        m = dy/dx;
+        b = (source.lat - m*source.lon);
+        c = (source.lon - source.lat/m);
+        
+        y = minLat/m + c;
+        if(y < maxLon && y> minLon){
+            if( (minLat < destination.lat && minLat >source.lat)||(minLat >destination.lat && minLat < source.lat) ){
+                intersections.add(new GHPoint(minLat,y));
+            }
+        }
+        
+        y = maxLat/m +c;
+        if(y < maxLon && y> minLon){
+            if( (maxLat < destination.lat && maxLat >source.lat)||(maxLat >destination.lat && maxLat < source.lat) ){
+                intersections.add(new GHPoint(maxLat,y));
+            }
+        }
+        
+        x = minLon*m + b;
+        if(x<maxLat && x >minLat){
+            if( (minLon < destination.lon && minLon >source.lon)||(minLon >destination.lon && minLon < source.lon) ){
+                intersections.add(new GHPoint(x,minLon));
+            }
+        }
+        
+        x = maxLon*m + b;
+        if(x<maxLat && x >minLat){
+            if( (maxLon < destination.lon && maxLon >source.lon)||(maxLon >destination.lon && maxLon < source.lon) ){
+                intersections.add(new GHPoint(x,maxLon));
+            }
+        }
+        return intersections;
+    }
 
     @Override
     public boolean contains( double lat, double lon )

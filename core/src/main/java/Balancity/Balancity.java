@@ -38,12 +38,17 @@ public class Balancity
 
     public static void main( String[] args ) throws IOException
     {
+        String postcodes = "C:/Users/Paul de Goffau/Desktop/Master thesis/convertPostcode/AveragedPostcodes.txt";
+        String ovin = "C:/Users/Paul de Goffau/Desktop/Master thesis/Enquette/OViN2014_Databestand.csv";
+        String savedInstance = "C:/xampp/htdocs/testfiles/test/instance.txt";
         String ghLoc = "target/balancity";
         String testOsm = "C:/Users/Paul de Goffau/Desktop/Master thesis/graphhopper/Amsterdam.osm.pbf";
         String testGPX = "C:/xampp/htdocs/testfiles/test";
         //String trafficTxt = "C:/xampp/htdocs/trafficData.txt";
         //String trafficJSON = "C:/xampp/htdocs/traffic.json";
         String trafficJSONTime =  "C:/xampp/htdocs/orderedTraffic.json";
+        
+        //AveragedPostCode pc = new AveragedPostCode(postcodes);
 
         BalanceHopper hopper = (BalanceHopper) new BalanceHopper().setStoreOnFlush(true).
                 setEncodingManager(new EncodingManager("CAR")).
@@ -53,27 +58,34 @@ public class Balancity
 
         int num_iterations = 10;
         SimulationSetup sim = new SimulationSetup();
-        ArrayList<VehicleUnit> instance = sim.generateInstance(num_iterations, 3000);
-        sim.saveInstance(instance, "testSave.txt");
-        ArrayList<VehicleUnit> loaded_instance = sim.loadInstance("testSave.txt");
+        //ArrayList<VehicleUnit> instance = sim.generateInstance(num_iterations, 3000);
+        ArrayList<VehicleUnit> instance = sim.generateOVINInstance(ovin, hopper);
+        sim.saveInstance(instance, savedInstance);
+        ArrayList<VehicleUnit> loaded_instance = sim.loadInstance(savedInstance);
         
         int i =0;
         for (VehicleUnit item:loaded_instance)
         {
             GHRequest routerequest = new GHRequest(item.getOrigin(),item.getDestination()).setAlgorithm("dijkstraTimeDependent").setWeighting("balanced").setTimeOffset(item.getStartTime());//new GHRequest(latFrom, lonFrom, latTo, lonTo);
             GHResponse ans = hopper.route(routerequest);
-
-            PathWrapper path = ans.getBest();
-            if(!path.hasErrors()){
-            InstructionList instr = path.getInstructions();
-            System.out.println("Time for route "+i+": " + path.getTime());
-            FileUtils.writeStringToFile(new File(testGPX + i + ".gpx"), instr.createGPX(""+i, 0, false, false, true, false));
-            i++;
-            }
-            else
+            
+            if(!ans.hasErrors())
             {
-                System.out.println(path.getErrors().toString());
-                System.out.println(item.getOrigin() + " to: " + item.getDestination());
+                PathWrapper path = ans.getBest();
+                if(!path.hasErrors()){
+                InstructionList instr = path.getInstructions();
+                System.out.println("Time for route "+i+": " + path.getTime());
+                FileUtils.writeStringToFile(new File(testGPX + i + ".gpx"), instr.createGPX(""+i, 0, false, false, true, false));
+                i++;
+                }
+                else
+                {
+                    System.out.println(path.getErrors().toString());
+                    System.out.println(item.getOrigin() + " to: " + item.getDestination());
+                }
+            }
+            else{
+                System.out.println(ans.getErrors().toString());
             }
         }
         TrafficData dt = new TrafficData();

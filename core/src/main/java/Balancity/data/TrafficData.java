@@ -33,7 +33,7 @@ import java.util.logging.Logger;
  */
 public class TrafficData
 {
-    private int MAX_TIME = 700;
+    private int MAX_TIME = 3000;
 
     public TrafficData()
     {
