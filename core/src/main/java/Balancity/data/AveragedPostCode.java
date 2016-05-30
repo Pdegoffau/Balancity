@@ -40,6 +40,11 @@ public class AveragedPostCode
         this.averagedPostCodes = new HashMap<>();
         this.loadAveragePostCodes();
     }
+    public AveragedPostCode(){
+        this.file = Balancity.Balancity.POSTCODE_CENTERS_FILE;
+        this.averagedPostCodes = new HashMap<>();
+        this.loadAveragePostCodes();
+    }
     
     public void loadAveragePostCodes(){
         try (BufferedReader br = new BufferedReader(new FileReader(file))) 

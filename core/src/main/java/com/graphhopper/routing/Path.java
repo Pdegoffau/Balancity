@@ -322,7 +322,7 @@ public class Path implements TimeConversion
     @Override
     public int convertToFrame( int atTime )
     {
-        return atTime /60;
+        return atTime /Balancity.Balancity.FRAMEWIDTH;
     }
 
     private int getRemainder( int atTime )

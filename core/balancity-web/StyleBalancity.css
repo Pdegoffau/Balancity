@@ -1,0 +1,28 @@
+body {
+	background-color: white;
+}
+
+h2 {
+	color: red;
+	font-family: calibri;
+}
+
+p{
+	color: black;
+	font-family: calibri;
+}
+
+form{
+	padding:2px;
+}
+
+#map{
+	height : 800px;
+	width: 1200px;
+	float:left;
+}
+
+#forms{
+	padding:10px;
+	float:right;
+}

@@ -101,7 +101,7 @@ public class BalanceWeighting extends AbstractWeighting implements TimeConversio
     @Override
     public int convertToFrame( int time )
     {
-        return time /60;
+        return time /Balancity.Balancity.FRAMEWIDTH;
     }
 
     

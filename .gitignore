@@ -40,3 +40,5 @@ local.properties
 *.zip
 .DS_Store
 core/balancity-web/testfiles/*.gpx
+core/balancity-web/*.json
+core/files/traffic-generation/OViN2014_Databestand.csv

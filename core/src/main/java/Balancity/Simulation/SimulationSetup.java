@@ -63,6 +63,7 @@ public class SimulationSetup
         this.sources = new ArrayList<GHPoint>();
         this.destinations = new ArrayList<GHPoint>();
 
+        //List of sources used for traffic that comes in from the outside of the map
         this.sources.add(a2_south_in);
         this.sources.add(a4_south_west_in);
         this.sources.add(a44_west_in);
@@ -80,6 +81,7 @@ public class SimulationSetup
         //this.sources.add(offices);
         //this.sources.add(molenwijk);
 
+        //List of destinations that is used as a mapping for the locations that are outside the map
         this.destinations.add(a2_south_out);
         this.destinations.add(a4_south_west_out);
         this.destinations.add(a44_west_out);
@@ -184,68 +186,77 @@ public class SimulationSetup
         }
     }
 
-    public ArrayList<VehicleUnit> generateOVINInstance( String file, GraphHopper hopper )
+    public ArrayList<VehicleUnit> generateOVINInstance( String OVINfile, GraphHopper hopper )
     {
-        AveragedPostCode pc = new AveragedPostCode("C:/Users/Paul de Goffau/Desktop/Master thesis/convertPostcode/AveragedPostcodes.txt");
-        ArrayList<VehicleUnit> test_objects = new ArrayList<VehicleUnit>();
-        try (BufferedReader br = new BufferedReader(new FileReader(file)))
+        AveragedPostCode postCodeCenters = new AveragedPostCode();
+        ArrayList<VehicleUnit> generatedInstance = new ArrayList<>();
+        
+        try (BufferedReader br = new BufferedReader(new FileReader(OVINfile)))
         {
             String line;
-            line = br.readLine(); // skip header
-            int counter = 0;
+            br.readLine(); // skip header row
+            int counter = 0; //  Count the number of generated routes
             while ((line = br.readLine()) != null)
             {
                 String[] entries = line.split(";");
                 if (entries[141].length() > 0)
                 {
+                     // car driver or passenger
                     int wayOfTraveling = Integer.parseInt(entries[141]);
                     if ((wayOfTraveling == 10 || wayOfTraveling == 6))
-                    { // car driver or passenger
+                    {
                         String fromPC = entries[80];
                         String toPC = entries[85];
-                        GHPoint realFrom = pc.getGPS(fromPC);
-                        GHPoint realTo = pc.getGPS(toPC);
+                        GHPoint realFrom = postCodeCenters.getGPS(fromPC);
+                        GHPoint realTo = postCodeCenters.getGPS(toPC);
                         GHPoint chosenFrom = realFrom;
                         GHPoint chosenTo = realTo;
+                        int additionalTimeOffset = 0;   //Additional timeoffset with respect to the ovin start time that is caused by the distance that must be traveled outside the map
 
-                        boolean start = false;
-                        boolean end = false;
+                        boolean startInMap = false;
+                        boolean endInMap = false;
                         if (realFrom != null && realTo != null)
                         {
-                            start = pc.PointInMap(realFrom, hopper);
-                            end = pc.PointInMap(realTo, hopper);
-                            if (start && end)
+                            startInMap = postCodeCenters.PointInMap(realFrom, hopper);
+                            endInMap = postCodeCenters.PointInMap(realTo, hopper);
+                            if (startInMap && endInMap)
                             {
-                                //Do nothing special
-                            } else if (start)
+                                //Do nothing special, skip branches
+                            } else if (startInMap)
                             {
-                                //TODO: implement something with the intersection
+                                // Only the start of the route is directly in the map, find a good approximation of the endpoint
+                                chosenTo = hopper.getGraphHopperStorage().getBounds().intersect(realFrom, realTo).get(0);
+                                
                                 //Map endpoint to the closest road at borders of map
                                 GHPoint closest = destinations.get(0);
                                 for (int i=1; i<destinations.size();i++)
                                 {
-                                    if (realTo.distanceTo(closest) > realTo.distanceTo(destinations.get(i)))
+                                    if (chosenTo.distanceTo(closest) > chosenTo.distanceTo(destinations.get(i)))
                                     {
                                         closest = destinations.get(i);
                                     }
                                 }
                                 chosenTo = closest;
-                            } else if (end)
+                            } else if (endInMap)
                             {
-                                //TODO: implement something with the intersection
+                                //Only the endpoint lies within the map, so find a good approximation of the ingoing source
+                                chosenFrom = hopper.getGraphHopperStorage().getBounds().intersect(realFrom, realTo).get(0);
                                 //Map startpoint to the closest road at borders of map
                                 GHPoint closest = sources.get(0);
                                 for (int i=1; i<sources.size(); i++)
                                 {
-                                    if (realFrom.distanceTo(closest) > realFrom.distanceTo(sources.get(i)))
+                                    if (chosenFrom.distanceTo(closest) > chosenFrom.distanceTo(sources.get(i)))
                                     {
                                         closest = sources.get(i);
                                     }
                                 }
                                 chosenFrom = closest;
+                                additionalTimeOffset = ((int) chosenFrom.distanceTo(realFrom)/70)*3600;
                             }
                             else
                             {
+                                //Both the start and the end are outside the map, but there may be a route between them through the map;
+                                //Find the intersections between a straight line between the two points with the bounding box of the map
                                 ArrayList<GHPoint> intersections = hopper.getGraphHopperStorage().getBounds().intersect(realFrom, realTo);
                                 if(intersections.size() > 0){
                                     if(intersections.get(0).distanceTo(intersections.get(1))>10){
@@ -259,14 +270,36 @@ public class SimulationSetup
                                             chosenFrom = intersections.get(1);
                                             chosenTo = intersections.get(0);
                                         }
+                                        //Map startpoint to the closest road at borders of map
+                                        GHPoint closestStart = sources.get(0);
+                                        for (int i=1; i<sources.size(); i++)
+                                        {
+                                            if (chosenFrom.distanceTo(closestStart) > chosenFrom.distanceTo(sources.get(i)))
+                                            {
+                                                closestStart = sources.get(i);
+                                            }
+                                        }
+                                        chosenFrom = closestStart;
+                                        //Map endpoint to the closest road at borders of map
+                                        GHPoint closestEnd = destinations.get(0);
+                                        for (int i=1; i<destinations.size();i++)
+                                        {
+                                            if (chosenTo.distanceTo(closestEnd) > chosenTo.distanceTo(destinations.get(i)))
+                                            {
+                                                closestEnd = destinations.get(i);
+                                            }
+                                        }
+                                        chosenTo = closestEnd;
+                                        additionalTimeOffset = ((int) chosenFrom.distanceTo(realFrom)/70)*3600;
                                     }else{continue;}
                                 }else{continue;}
-                                
                             }
+                            
+                            
                             if(chosenFrom.distanceTo(chosenTo)>1){
-                                System.out.println("From PC: " + fromPC + " GPS: " + chosenFrom + " to PC: " + toPC + " GPS: " + chosenTo);
-                                int startTime = Integer.parseInt(entries[96]) * 60 * 60 + Integer.parseInt(entries[97]) * 60;
-                                test_objects.add(new VehicleUnit(chosenFrom, chosenTo, startTime));
+                                //System.out.println("From PC: " + fromPC + " GPS: " + chosenFrom + " to PC: " + toPC + " GPS: " + chosenTo);
+                                int startTime = (Integer.parseInt(entries[96]) * 60 + Integer.parseInt(entries[97])) * 60 + additionalTimeOffset;
+                                generatedInstance.add(new VehicleUnit(chosenFrom, chosenTo, startTime));
                                 counter++;
                             }
                         }
@@ -282,6 +315,6 @@ public class SimulationSetup
         {
             System.err.println(ex.getMessage());
         }
-        return test_objects;
+        return generatedInstance;
     }
 }

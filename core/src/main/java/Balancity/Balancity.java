@@ -35,30 +35,31 @@ import org.apache.commons.io.FileUtils;
  */
 public class Balancity
 {
+    
+    public static int FRAMEWIDTH = 60;
+    public static String POSTCODE_CENTERS_FILE = "files/traffic-generation/PostcodeCenters.txt";
 
     public static void main( String[] args ) throws IOException
     {
-        String postcodes = "C:/Users/Paul de Goffau/Desktop/Master thesis/convertPostcode/AveragedPostcodes.txt";
-        String ovin = "C:/Users/Paul de Goffau/Desktop/Master thesis/Enquette/OViN2014_Databestand.csv";
-        String savedInstance = "C:/xampp/htdocs/testfiles/test/instance.txt";
+        String ovin = "files/traffic-generation/OViN2014_Databestand.csv";
+        String savedInstance = "balancity-web/testfiles/test/instance.txt";
         String ghLoc = "target/balancity";
-        String testOsm = "C:/Users/Paul de Goffau/Desktop/Master thesis/graphhopper/Amsterdam.osm.pbf";
-        String testGPX = "C:/xampp/htdocs/testfiles/test";
-        //String trafficTxt = "C:/xampp/htdocs/trafficData.txt";
-        //String trafficJSON = "C:/xampp/htdocs/traffic.json";
-        String trafficJSONTime =  "C:/xampp/htdocs/orderedTraffic.json";
+        String osmAmsterdam = "Amsterdam.osm.pbf";
+        String testGPX = "balancity-web/testfiles/test";
+        //String trafficTxt = "balancity-web/trafficData.txt";
+        //String trafficJSON = "balancity-web/traffic.json";
+        String trafficJSONTime =  "balancity-web/orderedTraffic.json";
         
         //AveragedPostCode pc = new AveragedPostCode(postcodes);
 
         BalanceHopper hopper = (BalanceHopper) new BalanceHopper().setStoreOnFlush(true).
                 setEncodingManager(new EncodingManager("CAR")).
                 setGraphHopperLocation(ghLoc).
-                setOSMFile(testOsm).setCHEnable(false);
+                setOSMFile(osmAmsterdam).setCHEnable(false);
         hopper.importOrLoad();
 
-        int num_iterations = 10;
         SimulationSetup sim = new SimulationSetup();
-        //ArrayList<VehicleUnit> instance = sim.generateInstance(num_iterations, 3000);
+        //ArrayList<VehicleUnit> instance = sim.generateInstance(10000, 3000); // #iterations, time_range
         ArrayList<VehicleUnit> instance = sim.generateOVINInstance(ovin, hopper);
         sim.saveInstance(instance, savedInstance);
         ArrayList<VehicleUnit> loaded_instance = sim.loadInstance(savedInstance);
@@ -92,11 +93,5 @@ public class Balancity
         //dt.saveTrafficToTextFile(hopper, trafficTxt);
         //dt.saveTrafficToJSON(hopper, trafficJSON);
         dt.saveTrafficOrderedByTime(hopper, trafficJSONTime);
-
-        /*        for(Instruction instruction : instr) {
-         System.out.println(instruction.toString());
-         }
-         System.out.println("Distance: " + path.getDistance());
-         */
     }
 }

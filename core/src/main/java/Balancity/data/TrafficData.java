@@ -33,11 +33,12 @@ import java.util.logging.Logger;
  */
 public class TrafficData
 {
-    private int MAX_TIME = 3000;
+    private int MAX_TIME= 0;
+    private int NUM_OF_HOURS = 28;
 
     public TrafficData()
     {
-
+        MAX_TIME = (NUM_OF_HOURS*60*60)/Balancity.Balancity.FRAMEWIDTH; //Total simulation time in seconds divided by framewidth
     }
 
     public void saveTrafficToTextFile( BalanceHopper graphhopper, String filepath )
