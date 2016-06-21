@@ -6,7 +6,7 @@
 <link rel ="stylesheet" href="StyleBalancity.css" />
 
 </head>
-<body>
+<body onload = "pageLoad()">
 
 <h2>Open Street Map Routing</h2>
 <p>This page shows balanced routing using Open Street Map and Graphhopper.</p>
@@ -14,30 +14,46 @@
 <div id="map"></div>
 
 <div id="trafficLayer">
-<button id="loadJsonFile" type="button" onclick="loadTrafficJSON()"> Traffic </button>
+<div id="slider">
+<button id="decrement" type = "button" onclick="decrement();loadTrafficJSON()"> - </button>
+<form>
+<input type="range" name="TrafficTime" id="TrafficTime" onchange = "loadTrafficJSON()" oninput = "loadTrafficJSON()" value="0" min="0" max="getNumberOfTimes()" step = "1">
+</form>
+<button id="increment" type = "button" onclick="increment();loadTrafficJSON()"> + </button>
+</div>
+<!--<button id="loadJsonFile" type="button" onclick="loadTrafficJSON()"> Traffic </button>-->
+<button id="clearLayers" type="button" onclick="clearMap()"> Clear Layers </button>
 <p id="time"></p>
 <button id="loadOD" type="button" onclick="loadOD()"> Origin-Destination </button> 
-</div>
-
-<div id="forms">
-<form>
-<button id="buttonA" type="button" onclick="markerAClicked()"> A </button> lat:	<input id="alat" type="text" name ="alat">
-long:	<input id="alng" type="text" name = "alng">
-<br>
-<button id="buttonB" type="button" onclick="markerBClicked()"> B </button> lat:	<input id="blat" type="text" name="blat">
-long:	<input id="blng" type="text" name="blng"><br>
-<input type="submit" value="Route">
-</form>
+<BR>
+GPX: <input type="checkbox" onclick="showGPS()" id="gpxCheckBox">
 </div>
 
 
 <script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
-<script src="https://rawgithub.com/mpetazzoni/leaflet-gpx/master/gpx.js"></script>
+<script src="gpx.js"></script>
 <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
 <script> 
 
+	var times = [];
+
+	function pageLoad()
+	{
+		setNumberOfTimes();
+	}
+
+	function increment()
+	{
+		document.getElementById("TrafficTime").stepUp(1)
+	}
+	
+	function decrement()
+	{
+		document.getElementById("TrafficTime").stepDown(1)
+	}
+
 	var map = L.map('map').setView([52.37162, 4.90505], 12);
-	L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpandmbXliNDBjZWd2M2x6bDk3c2ZtOTkifQ._QA7i5Mpkd_m30IGElHziw', 	{
+	L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoicGRlZ29mZmF1IiwiYSI6ImNpcGZ0bmt1bTAwMGd2Nm5scG03YzNnanMifQ.KxQDEZzmLCdnJa3ZY_DURg', 	{
 			maxZoom: 18,
 			attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
 				'<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
@@ -64,136 +80,108 @@ long:	<input id="blng" type="text" name="blng"><br>
 			shadowAnchor:	[4,62],
 			popupAnchor:	[-3,-76]
 		});
+
+		var gpxLayerGroup = new L.LayerGroup();
 		
-		var AGenerated = false;
-		var BGenerated = false;
-		var marker_index = 0;
-		
-		function markerAClicked()
+		function showGPS()
 		{
-			if(AGenerated){
-				map.removeLayer(markerA);
-				AGenerated = false;
-			}
-			
-			//Place marker
-			marker_index = 0;
-		}
-		
-		function markerBClicked()
-		{
-			if(BGenerated)
+			if(document.getElementById("gpxCheckBox").checked)
 			{
-				map.removeLayer(markerB);
-				BGenerated = false;
-			}
-			
-			//Place marker
-			marker_index = 1;
-		}
-		
-		function onMapClick(e) 
-		{
-		
-			if(!AGenerated&&marker_index==0)
-			{
-				markerA = new L.marker(e.latlng, {draggable:'true'});
-				AGenerated = true;			
-				document.getElementById('alng').value = e.latlng.lng;
-				document.getElementById('alat').value= e.latlng.lat;
-				markerA.addTo(map);
-				marker_index=1;
+				for(i=0;i <100;i=i+1)
+				{
+					var gpx = "http://localhost/testfiles/test" + i+ ".gpx";		
+					var GPX = new L.GPX(gpx,{async:true}).on('loaded',function(e) {
+					map.fitBounds(e.target.getBounds());
+					});
+					gpxLayerGroup.addLayer(GPX);
+					gpxLayerGroup.addTo(map);
+				}
 			}
 			else
 			{
-				if(!BGenerated&&marker_index==1){
-					markerB = new L.marker(e.latlng);
-					BGenerated = true;
-					document.getElementById('blng').value = e.latlng.lng;
-					document.getElementById('blat').value= e.latlng.lat;			
-					markerB.addTo(map);
-					marker_index=0;
-				}
+				gpxLayerGroup.clearLayers();
 			}
-		}
-
-		
-		map.on('click', onMapClick);
-		/*for(i=0;i <1000;i++){
-			var gpx = "http://localhost/testfiles/test" + i+ ".gpx";		
-			new L.GPX(gpx,{async:true}).on('loaded',function(e) {
-			map.fitBounds(e.target.getBounds());
-			}).addTo(map);		
-			}*/
 			
+		}
+		
+	function setNumberOfTimes()
+	{	
+		jQuery.getJSON('orderedTraffictimes.json', function(data){
+			document.getElementById("TrafficTime").max = data.times.length - 1;
+			for(i=0;i<data.times.length;i++)
+			{
+				times[i] = data.times[i].time;
+			}
+		});
+
+	}
+	
 	function loadTrafficJSON()
 	{
 		clearMap();
-		jQuery.getJSON('orderedtraffic.json', function(data){
+		var j = times[document.getElementById("TrafficTime").value];
+		jQuery.getJSON('orderedtraffic'+j+'.json', function(data)
+		{
 			var maxTraffic = 0;
-			for(j=0;j<data.traffic.length;j++){
-				(function(j) {
-					setTimeout(function() 
+			for(i=0; i<data.traffic.length; i++)
+			{
+				var hours = Math.floor(data.traffic[i].time / 60);
+				var minutes = data.traffic[i].time %60;
+				if(minutes<10)
+				{
+					document.getElementById("time").innerHTML = hours.toFixed(0) + ":0"+minutes.toFixed(0);
+				}
+				else
+				{
+					document.getElementById("time").innerHTML = hours.toFixed(0) + ":"+minutes.toFixed(0);
+				}
+				var pointA = new L.LatLng(data.traffic[i].latFrom, data.traffic[i].lonFrom);
+				var pointB = new L.LatLng(data.traffic[i].latTo, data.traffic[i].lonTo);
+				var pointList = [pointA, pointB];
+				
+				if(data.traffic[i].trafficCount > maxTraffic)
+				{
+					maxTraffic = data.traffic[i].trafficCount;
+				}
+				if(data.traffic[i].trafficCount>0.6)
+				{
+					if(data.traffic[i].trafficCount >0.5)
 					{
-						clearMap();
-						for(i=0; i<data.traffic[j].time.length; i++)
+						if(data.traffic[i].trafficCount <2)
 						{
-							var hours = Math.floor(data.traffic[j].time[i].time / 60);
-							var minutes = data.traffic[j].time[i].time %60;
-							if(minutes<10){
-								document.getElementById("time").innerHTML = hours.toFixed(0) + ":0"+minutes.toFixed(0);
-							}
-							else{
-								document.getElementById("time").innerHTML = hours.toFixed(0) + ":"+minutes.toFixed(0);
-							}
-							var pointA = new L.LatLng(data.traffic[j].time[i].latFrom, data.traffic[j].time[i].lonFrom);
-							var pointB = new L.LatLng(data.traffic[j].time[i].latTo, data.traffic[j].time[i].lonTo);
-							var pointList = [pointA, pointB];
-							if(data.traffic[j].time[i].trafficCount > maxTraffic){
-								maxTraffic = data.traffic[j].time[i].trafficCount;
-							}
-								if(data.traffic[j].time[i].trafficCount>0.6)
-								{
-									if(data.traffic[j].time[i].trafficCount >0.5){
-										if(data.traffic[j].time[i].trafficCount <2)
-										{
-											var firstpolyline = new L.Polyline(pointList, {
-											color: 'green',
-											weight: 7,
-											opacity: 1,
-											smoothFactor: 1
-
-											});
-											firstpolyline.addTo(map);
-										}else if(data.traffic[j].time[i].trafficCount<3)
-										{
-											var firstpolyline = new L.Polyline(pointList, {
-											color: 'orange',
-											weight: 7,
-											opacity: 1,
-											smoothFactor: 1
-
-											});
-											firstpolyline.addTo(map);
-										}else
-										{
-											var firstpolyline = new L.Polyline(pointList, {
-											color: 'red',
-											weight: 7,
-											opacity: 1,
-											smoothFactor: 1
-
-											});
-											firstpolyline.addTo(map);
-										}
-									}
-								}
+							var firstpolyline = new L.Polyline(pointList, 
+							{
+								color: 'green',
+								weight: 7,
+								opacity: 1,
+								smoothFactor: 1
+							});
+							firstpolyline.addTo(map);
+						}else if(data.traffic[i].trafficCount<3)
+						{
+							var firstpolyline = new L.Polyline(pointList, 
+							{
+								color: 'orange',
+								weight: 7,
+								opacity: 1,
+								smoothFactor: 1
+							});
+							firstpolyline.addTo(map);
+						}else
+						{
+							var firstpolyline = new L.Polyline(pointList, 
+							{
+								color: 'red',
+								weight: 7,
+								opacity: 1,
+								smoothFactor: 1
+							});
+							firstpolyline.addTo(map);
 						}
-								console.log('maxTraffic: '+maxTraffic);
-					}, 300*j);
-				})(j);
+					}
+				}
 			}
-
+				console.log('maxTraffic: '+maxTraffic);
 		});
 	}
 	

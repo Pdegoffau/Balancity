@@ -76,14 +76,6 @@ abstract class EdgeAccess
     {
         edges.setInt(edgePointer + E_DIST, distToInt(distance));
     }
-    
-    final void setTrafficCount(int edgeOrShortcutId, int time, double trafficCount){
-        edges.setTrfCnt(edgeOrShortcutId,time,trafficCount);
-    }
-    
-    final double getTrafficCount(int edgeOrShortcutId, int time){
-        return edges.getTrfCnt(edgeOrShortcutId, time);
-    }
 
     /**
      * Translates double distance to integer in order to save it in a DataAccess object

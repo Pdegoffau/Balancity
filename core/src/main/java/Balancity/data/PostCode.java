@@ -19,7 +19,10 @@ import com.graphhopper.GraphHopper;
 import com.graphhopper.util.shapes.Circle;
 import com.graphhopper.util.shapes.GHPoint;
 import java.io.*;
-import java.util.HashMap;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -44,8 +47,8 @@ public class PostCode
             while ((line = br.readLine()) != null)
             {
                 String[] pcodes = line.split(",");
-                double lat = Double.parseDouble(pcodes[1]);
-                double lon = Double.parseDouble(pcodes[2]);
+                double lat = Double.parseDouble(pcodes[2]);
+                double lon = Double.parseDouble(pcodes[1]);
                 postCodes.put(pcodes[0], new GHPoint(lat, lon));
             }
         } catch (FileNotFoundException ex)
@@ -62,7 +65,45 @@ public class PostCode
         return postCodes.get(postcode);
     }
     
+    public String closestPostCode(double lat, double lon){
+        String res = "";
+        double min_distance = Double.POSITIVE_INFINITY;
+        Set data = postCodes.entrySet();
+        Iterator iter = data.iterator();
+        while(iter.hasNext()){
+            Entry fromList = (Entry) iter.next();
+            GHPoint po = (GHPoint) fromList.getValue();
+            if(po.distanceTo(new GHPoint(lat,lon))<min_distance){
+                res =(String) fromList.getKey();
+                min_distance = po.distanceTo(new GHPoint(lat,lon));
+            }
+        }
+        return res;
+    }
+    
+    
     public boolean PointInMap(GHPoint point, GraphHopper hopper){
         return hopper.getGraphHopperStorage().getBounds().intersect(new Circle(point.lat,point.lon,1));
+    }
+    
+    public static void loadEdges(String filePath)
+    {
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath)))
+        {
+            String line;
+            while ((line = br.readLine()) != null)
+            {
+                String[] data = line.split(",");
+                Balancity.Balancity.edgeInfo.setPostcode(Integer.parseInt(data[0]), data[1]);
+            }
+            
+        } catch (FileNotFoundException ex)
+        {
+            System.err.println(ex.getMessage());
+        } catch (IOException ex)
+        {
+            System.err.println(ex.getMessage());
+        }
+        
     }
 }

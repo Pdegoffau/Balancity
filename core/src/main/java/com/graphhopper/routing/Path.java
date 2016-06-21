@@ -241,7 +241,6 @@ public class Path implements TimeConversion
         EdgeIteratorState iter = graph.getEdgeIteratorState(edgeId, adjNode);
         double dist = iter.getDistance();
         distance += dist;
-        iter.setTrafficCount(iter.getTrafficCount((int)(distance))+1, (int)(distance));
         time += calcMillis(dist, iter.getFlags(), false);
         addEdge(edgeId);
     }
@@ -267,17 +266,29 @@ public class Path implements TimeConversion
     public int updateTrafficEdge(TDSPTEntry edge,int endTime)
     {
         EdgeIteratorState iter = graph.getEdgeIteratorState(edge.edge, edge.adjNode);
+        double speed = this.encoder.getSpeed(iter.getFlags());
         int atTime= convertToFrame(endTime-(int)edge.time);
         int remainder = getRemainder(endTime-(int)edge.time);
-        double addA = (double)((60-remainder)/60.0);
-        double addB = (double)(remainder/60.0);
+        double addA, addB;
+        if(Balancity.Balancity.FRAMEWIDTH-remainder <edge.time){
+            addA = Balancity.Balancity.FRAMEWIDTH-remainder;
+            addB = edge.time - addA;
+        }
+        else
+        {
+            addA = edge.time;
+            addB = 0.0;
+        }
         if(addA>0.0){
-            double oldTrafficCount = iter.getTrafficCount(atTime);
-            iter.setTrafficCount(oldTrafficCount+addA, atTime);
+            //double oldTrafficCount = iter.getTrafficCount(atTime);
+            //iter.setTrafficCount(oldTrafficCount+addA, atTime);
+            //TODO: getSpeed, getCarType 50 assumed
+            Balancity.Balancity.edgeInfo.addEntry(edge.edge, atTime, addA, speed,"car");
         }
         if(addB>0.0){
-            double oldTrafficCountRemainder = iter.getTrafficCount(atTime+1);
-            iter.setTrafficCount(oldTrafficCountRemainder+addB, atTime+1);
+            //double oldTrafficCountRemainder = iter.getTrafficCount(atTime+1);
+            //iter.setTrafficCount(oldTrafficCountRemainder+addB, atTime+1);
+            Balancity.Balancity.edgeInfo.addEntry(edge.edge, atTime+1, addB, speed,"car");
         }
         return (int)edge.time;
     }

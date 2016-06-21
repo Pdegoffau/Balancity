@@ -72,15 +72,15 @@ public class BalanceWeighting extends AbstractWeighting implements TimeConversio
             tmpWeight += PENALTY;
         
         res[1] = tmpWeight; //Time duration of edge
-        double tfc;
-        tfc = edge.getTrafficCount(convertToFrame(startTime));
-        
+        //double tfc;
+        //tfc = edge.getTrafficCount(convertToFrame(startTime));
         /*
         if(tfc>0){
             System.out.println("Traffic count: "+tfc);
         }
         */
-        tmpWeight += tfc*3;
+        double fijnstof = Balancity.Balancity.edgeInfo.getFijnstof(edge.getEdge(), convertToFrame(startTime),edge.getDistance());
+        tmpWeight += fijnstof;
 
         res[0] = tmpWeight; //Weight that is used for route choices
         return res;

@@ -217,16 +217,4 @@ class VirtualEdgeIterator implements EdgeIterator, CHEdgeIteratorState
     {
         throw new UnsupportedOperationException("Not supported.");
     }
-
-    @Override
-    public double getTrafficCount( int time )
-    {
-        return edges.get(current).getTrafficCount(time);
-    }
-
-    @Override
-    public void setTrafficCount( double trafficCnt, int time )
-    {
-        edges.get(current).setTrafficCount(trafficCnt, time);
-    }
 }

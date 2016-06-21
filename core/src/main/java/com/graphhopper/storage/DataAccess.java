@@ -132,6 +132,4 @@ public interface DataAccess extends Storable<DataAccess>
      */
     DAType getType();
 
-    public void setTrfCnt( int edgeOrShortcutId, int time, double trafficCount );
-    public double getTrfCnt (int edgeId, int time);
 }

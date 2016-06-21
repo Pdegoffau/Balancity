@@ -37,7 +37,6 @@ public class VirtualEdgeIteratorState implements EdgeIteratorState, CHEdgeIterat
     private final int originalTraversalKey;
     // indication if edges are dispreferred as start/stop edge 
     private boolean unfavored;
-    //private int[] trafficCnt;
 
     public VirtualEdgeIteratorState( int originalTraversalKey, int edgeId, int baseNode, int adjNode, double distance, long flags, String name, PointList pointList )
     {
@@ -49,10 +48,6 @@ public class VirtualEdgeIteratorState implements EdgeIteratorState, CHEdgeIterat
         this.flags = flags;
         this.name = name;
         this.pointList = pointList;
-        /*this.trafficCnt = new int[MAX_TIME];
-        for(int i=0; i<this.trafficCnt.length;i++){
-            this.trafficCnt[i] = 0;
-        }*/
     }
 
     /**
@@ -251,24 +246,4 @@ public class VirtualEdgeIteratorState implements EdgeIteratorState, CHEdgeIterat
     {
         throw new UnsupportedOperationException("Not supported.");
     }
-
-    @Override
-    public double getTrafficCount( int time )
-    {//FIXME: Check if this must be implemented.
-        /*
-        if(time<MAX_TIME){
-        return this.trafficCnt[time];
-        }
-        else*/
-        return 0.0;
-            
-    }
-
-    @Override
-    public void setTrafficCount( double trafficCnt, int time )
-    {
-        //FIXME: Check if this must be implemented.
-        //do nothing
-    }
-
 }

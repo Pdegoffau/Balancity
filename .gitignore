@@ -42,3 +42,6 @@ local.properties
 core/balancity-web/testfiles/*.gpx
 core/balancity-web/*.json
 core/files/traffic-generation/OViN2014_Databestand.csv
+core/files/environment/soundMap.txt
+core/files/environment/splitted/*.txt
+core/files/traffic-generation/pcode.txt

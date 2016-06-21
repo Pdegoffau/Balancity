@@ -21,6 +21,7 @@ import com.graphhopper.GraphHopper;
 import com.graphhopper.util.shapes.GHPoint;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -57,6 +58,12 @@ public class SimulationSetup
     GHPoint rijksmuseum = new GHPoint(52.357194, 4.881610); // Parking nearby Rijksmuseum
     GHPoint offices = new GHPoint(52.400623, 4.836363); //Industry park Westpoort
     GHPoint molenwijk = new GHPoint(52.418934, 4.890091); //Residences north of Amsterdam
+    GHPoint north = new GHPoint(52.433892, 4.865876);
+    GHPoint south = new GHPoint(52.314403, 4.921465);
+    
+    ArrayList<Integer> startTimes;
+    double expectedStartTime =0;
+    double varianceTime =0;
 
     public SimulationSetup()
     {
@@ -98,6 +105,8 @@ public class SimulationSetup
         //this.destinations.add(rijksmuseum);
         //this.destinations.add(offices);
         //this.destinations.add(molenwijk);
+        
+        startTimes = new ArrayList<>();
     }
 
     public ArrayList<VehicleUnit> generateInstance( int num_items, int time_interval )
@@ -184,6 +193,16 @@ public class SimulationSetup
         {
             return false;
         }
+    }
+    
+    public ArrayList<VehicleUnit> generateSameStartEnd(int number_of_routes)
+    {
+        ArrayList<VehicleUnit> generatedInstance = new ArrayList<>(number_of_routes);
+        while(generatedInstance.size()<number_of_routes)
+        {
+            generatedInstance.add(new VehicleUnit(south, north,0));
+        }
+        return generatedInstance;
     }
 
     public ArrayList<VehicleUnit> generateOVINInstance( String OVINfile, GraphHopper hopper )
@@ -300,6 +319,7 @@ public class SimulationSetup
                                 //System.out.println("From PC: " + fromPC + " GPS: " + chosenFrom + " to PC: " + toPC + " GPS: " + chosenTo);
                                 int startTime = (Integer.parseInt(entries[96]) * 60 + Integer.parseInt(entries[97])) * 60 + additionalTimeOffset;
                                 generatedInstance.add(new VehicleUnit(chosenFrom, chosenTo, startTime));
+                                startTimes.add(startTime);
                                 counter++;
                             }
                         }
@@ -316,5 +336,47 @@ public class SimulationSetup
             System.err.println(ex.getMessage());
         }
         return generatedInstance;
+    }
+    
+    public ArrayList<VehicleUnit> quantifyInstance(ArrayList<VehicleUnit> originalInstance, int numOfItems){
+        ArrayList<VehicleUnit> instance = new ArrayList<>(numOfItems);
+        //this.expectedStartTime = calcExpectedTime();
+        //this.varianceTime = calcVariance();
+        //writeStartTimesToFile("startTimes.txt");
+        while(instance.size()<numOfItems){
+            int index = new Random().nextInt(originalInstance.size());
+            VehicleUnit route = originalInstance.get(index);
+            instance.add(new VehicleUnit(route.getOrigin(), route.getDestination(), originalInstance.get(new Random().nextInt(originalInstance.size())).getStartTime()));  //Time: (int)(expectedStartTime +new Random().nextGaussian()*varianceTime)
+        }
+        return instance;
+    }
+    
+    public double calcExpectedTime(){
+        int sum =0;
+        for(int time: startTimes){
+            sum +=time;
+        }
+        return sum/startTimes.size();
+    }
+    
+    public double calcVariance(){
+        double temp = 0;
+        for(int a :startTimes)
+            temp += (expectedStartTime-a)*(expectedStartTime-a);
+        return temp/startTimes.size();
+    }
+    
+    public void writeStartTimesToFile(String filename){
+        try
+        {
+            PrintWriter writer = new PrintWriter(filename);
+            for(int time: startTimes){
+                writer.print(time+ ",");
+            }
+            writer.close();
+        } catch (FileNotFoundException ex)
+        {
+            Logger.getLogger(SimulationSetup.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }

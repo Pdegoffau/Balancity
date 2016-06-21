@@ -44,7 +44,6 @@ public abstract class AbstractDataAccess implements DataAccess
     protected final ByteOrder byteOrder;
     protected final BitUtil bitUtil;
     protected transient boolean closed = false;
-    protected HashMap edgeIdToTFCcount = new HashMap<Integer, HashMap<Integer, Double>>();
 
     public AbstractDataAccess( String name, String location, ByteOrder order )
     {
@@ -248,41 +247,5 @@ public abstract class AbstractDataAccess implements DataAccess
     protected boolean isIntBased()
     {
         return false;
-    }
-
-    @Override
-    public void setTrfCnt( int edgeId, int time, double trafficCount )
-    {
-        if (trafficCount > 0)
-        {
-            if (edgeIdToTFCcount.containsKey(edgeId))
-            {
-                ((HashMap) edgeIdToTFCcount.get(edgeId)).put(time, trafficCount);
-            } else
-            {
-                HashMap<Integer, Double> hM = new HashMap();
-                hM.put(time, trafficCount);
-                edgeIdToTFCcount.put(edgeId, hM);
-            }
-        } else
-        {
-            System.out.println("Don't store negative trafficCount!");
-        }
-    }
-
-    @Override
-    public double getTrfCnt( int edgeId, int time )
-    {
-        if (edgeIdToTFCcount.containsKey(edgeId))
-        {
-            if (((HashMap) edgeIdToTFCcount.get(edgeId)).containsKey(time))
-            {
-                double trfCnt = (double) ((HashMap) edgeIdToTFCcount.get(edgeId)).get(time);
-                return trfCnt;
-            } else
-                return 0.0;
-
-        } else
-            return 0.0;
     }
 }
